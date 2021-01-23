@@ -1,3 +1,5 @@
+package pl.kmolski.client;
+
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
