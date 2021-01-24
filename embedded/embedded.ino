@@ -73,7 +73,7 @@ void setup() {
   IPAddress ip_addr = WiFi.localIP();
   snprintf(line_buf, 17, "%d.%d.%d.%d", ip_addr[0], ip_addr[1], ip_addr[2], ip_addr[3]);
   lcd.setCursor(0, 1);
-  lcd.print(napis);
+  lcd.print(line_buf);
 
   mqtt_client.setServer(MQTT_SERVER_IP, 1883);
 }
@@ -92,9 +92,9 @@ void loop() {
 
   char line_buf[17] = {0};
 
-  snprintf(line_buf, 17, "Load: %lf", scale.get_units(10));
+  snprintf(line_buf, 17, "Load: %*.2lfg", 9, scale.get_units(10));
   lcd.setCursor(0, 0);
-  lcd.print(napis);
+  lcd.print(line_buf);
 
   switch (current_state) {
     case CoasterState::IDLE: {
@@ -116,9 +116,9 @@ void loop() {
         current_state = CoasterState::MEASURE_SECOND;
         second_weight = scale.get_units(10);
         lcd.setCursor(0, 0);
-        snprintf(napis, 17, "Water vol. %.2lfml", (first_weight - second_weight) / WATER_DENSITY);
-        lcd.print(napis);
-        mqtt_client.publish(MQTT_TOPIC, napis);
+        snprintf(line_buf, 17, "Volume: %*.2lfml", 6, (first_weight - second_weight) / WATER_DENSITY);
+        lcd.print(line_buf);
+        mqtt_client.publish(MQTT_TOPIC, line_buf);
         Serial.print(mqtt_client.state());
         delay(1000);
         current_state = CoasterState::IDLE;
@@ -134,7 +134,7 @@ void loop() {
     scale.tare();
   }
 
-  Serial.println(napis);
+  Serial.println(line_buf);
   if (button1 | button2 | button3) {
     digitalWrite(19, HIGH);
   } else {
