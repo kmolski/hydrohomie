@@ -14,6 +14,16 @@ HX711 scale;
 WiFiClient wifi_client;
 PubSubClient mqtt_client { wifi_client };
 
+TaskHandle_t load_cell_task;
+std::atomic<float> load;
+
+void loadCellTask(void*) {
+  while (true) {
+    load = scale.get_units(10);
+    delay(50);
+  }
+}
+
 enum class CoasterState {
   IDLE,
   MEASURE_FIRST,
@@ -64,6 +74,8 @@ void setup() {
   scale.tare();
   //scale.set_offset(-283368);
 
+  xTaskCreatePinnedToCore(loadCellTask, "load cell task", 1000, NULL, 1, &load_cell_task, 0);
+
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
@@ -92,7 +104,7 @@ void loop() {
 
   char line_buf[17] = {0};
 
-  snprintf(line_buf, 17, "Load: %*.2lfg", 9, scale.get_units(10));
+  snprintf(line_buf, 17, "Load: %*.2lfg", 9, double(load));
   lcd.setCursor(0, 0);
   lcd.print(line_buf);
 
@@ -100,7 +112,7 @@ void loop() {
     case CoasterState::IDLE: {
       if (button1) {
         current_state = CoasterState::MEASURE_FIRST;
-        first_weight = scale.get_units(10);
+        first_weight = load;
         lcd.setCursor(0, 0);
         lcd.print("Start");
         mqtt_client.publish(MQTT_TOPIC, "Start");
@@ -114,7 +126,7 @@ void loop() {
     case CoasterState::FIRST_COMPLETE: {
       if (button1) {
         current_state = CoasterState::MEASURE_SECOND;
-        second_weight = scale.get_units(10);
+        second_weight = load;
         lcd.setCursor(0, 0);
         snprintf(line_buf, 17, "Volume: %*.2lfml", 6, (first_weight - second_weight) / WATER_DENSITY);
         lcd.print(line_buf);
@@ -134,10 +146,11 @@ void loop() {
     scale.tare();
   }
 
-  Serial.println(line_buf);
   if (button1 | button2 | button3) {
     digitalWrite(19, HIGH);
   } else {
     digitalWrite(19, LOW);
   }
+
+  delay(100);
 }
