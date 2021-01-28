@@ -5,7 +5,11 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
 public class Client {
     public static void main(String[] args) throws Exception {
-        var client = new MqttClient(Secrets.MQTT_SERVER_URL, "client");
+        if (args.length < 2) {
+            throw new IllegalArgumentException("Connection string and MQTT topic required!");
+        }
+
+        var client = new MqttClient(args[0], "client");
         var options = new MqttConnectOptions();
         options.setAutomaticReconnect(true);
         options.setConnectionTimeout(5);
@@ -13,7 +17,7 @@ public class Client {
 
         System.out.println("Connected to host " + client.getServerURI() +"!");
 
-        client.subscribe(Secrets.MQTT_TOPIC, (topic, msg) -> {
+        client.subscribe(args[1], (topic, msg) -> {
             System.out.println("New message on topic `" + topic + "`: " + msg);
         });
     }
