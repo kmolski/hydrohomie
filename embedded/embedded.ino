@@ -36,7 +36,7 @@ enum class CoasterState {
 
 std::atomic<CoasterState> current_state { CoasterState::IDLE };
 std::atomic<bool> button1 { false }, button2 { false }, button3 { false };
-double first_weight = 0.0, second_weight = 0.0;
+double first_weight = 0.0, second_weight = 0.0, total = 0.0;
 
 constexpr double WATER_DENSITY = 0.9975415;
 
@@ -81,13 +81,18 @@ void setup() {
     delay(100);
   }
 
-  char line_buf[17] = {0};
-  IPAddress ip_addr = WiFi.localIP();
-  snprintf(line_buf, 17, "%d.%d.%d.%d", ip_addr[0], ip_addr[1], ip_addr[2], ip_addr[3]);
-  lcd.setCursor(0, 1);
-  lcd.print(line_buf);
-
   mqtt_client.setServer(MQTT_SERVER_IP, 1883);
+}
+
+char statusToChar(int state) {
+  switch (state) {
+    case MQTT_CONNECTED:
+      return 'C';
+    case MQTT_DISCONNECTED:
+      return 'D';
+    default:
+      return 'N';
+  }
 }
 
 void loop() {
@@ -103,9 +108,13 @@ void loop() {
   mqtt_client.loop();
 
   char line_buf[17] = {0};
-
   snprintf(line_buf, 17, "Load: %*.2lfg", 9, double(load));
   lcd.setCursor(0, 0);
+  lcd.print(line_buf);
+
+  snprintf(line_buf, 17, "%c:%+3d T:%6.1lfml",
+           statusToChar(mqtt_client.state()), WiFi.RSSI(), total);
+  lcd.setCursor(0, 1);
   lcd.print(line_buf);
 
   switch (current_state) {
@@ -128,7 +137,9 @@ void loop() {
         current_state = CoasterState::MEASURE_SECOND;
         second_weight = load;
         lcd.setCursor(0, 0);
-        snprintf(line_buf, 17, "Volume: %*.2lfml", 6, (first_weight - second_weight) / WATER_DENSITY);
+        double volume = (first_weight - second_weight) / WATER_DENSITY;
+        total += volume;
+        snprintf(line_buf, 17, "Volume: %*.2lfml", 6, volume);
         lcd.print(line_buf);
         mqtt_client.publish(MQTT_TOPIC, line_buf);
         Serial.print(mqtt_client.state());
@@ -140,6 +151,10 @@ void loop() {
 
     default:
       break;
+  }
+
+  if (button2) {
+    total = 0.0;
   }
 
   if (button3) {
