@@ -7,6 +7,7 @@
 #include "secrets.h"
 
 #include <atomic>
+#include <chrono>
 
 LiquidCrystal lcd(18, 5, 17, 16, 4, 2);
 HX711 scale;
@@ -14,12 +15,37 @@ HX711 scale;
 WiFiClient wifi_client;
 PubSubClient mqtt_client { wifi_client };
 
+TaskHandle_t buzzer_task;
+std::chrono::steady_clock st_clock;
+std::chrono::time_point<std::chrono::steady_clock> last_activity;
+constexpr std::chrono::hours MAX_INACTIVE_TIME { 1 };
+
+void buzzerTask(void*) {
+  bool buzzer_state = LOW;
+  while (true) {
+    if (st_clock.now() - last_activity > MAX_INACTIVE_TIME) {
+      buzzer_state = !buzzer_state;
+    } else {
+      buzzer_state = LOW;
+    }
+
+    digitalWrite(19, buzzer_state);
+    delay(1000);
+  }
+}
+
 TaskHandle_t load_cell_task;
-std::atomic<float> load;
+std::atomic<float> last_load, load;
 
 void loadCellTask(void*) {
   while (true) {
+    last_load = float(load);
     load = scale.get_units(10);
+
+    if (abs(last_load - load) > 20.0) {
+      last_activity = st_clock.now();
+    }
+
     delay(50);
   }
 }
@@ -52,6 +78,8 @@ void setup() {
 
   pinMode(19, OUTPUT);
   digitalWrite(19, LOW);
+  last_activity = st_clock.now();
+  xTaskCreatePinnedToCore(buzzerTask, "buzzer task", 1000, NULL, 1, &buzzer_task, 0);
 
   pinMode(25, INPUT);
   attachInterrupt(digitalPinToInterrupt(25), button3ISR, CHANGE);
@@ -60,6 +88,7 @@ void setup() {
   pinMode(27, INPUT);
   attachInterrupt(digitalPinToInterrupt(27), button1ISR, CHANGE);
 
+// Load cell calibration code
 //  scale.set_scale();
 //  scale.tare();
 //  lcd.setCursor(0, 0);
@@ -72,7 +101,6 @@ void setup() {
 
   scale.set_scale(-867.8136055);
   scale.tare();
-  //scale.set_offset(-283368);
 
   xTaskCreatePinnedToCore(loadCellTask, "load cell task", 1000, NULL, 1, &load_cell_task, 0);
 
@@ -108,41 +136,67 @@ void loop() {
   mqtt_client.loop();
 
   char line_buf[17] = {0};
-  snprintf(line_buf, 17, "Load: %*.2lfg", 9, double(load));
-  lcd.setCursor(0, 0);
-  lcd.print(line_buf);
 
-  snprintf(line_buf, 17, "%c:%+3d T:%6.1lfml",
-           statusToChar(mqtt_client.state()), WiFi.RSSI(), total);
+  snprintf(line_buf, 17, "T:%6.1lfml %c:%+3d",
+           total, statusToChar(mqtt_client.state()), WiFi.RSSI());
   lcd.setCursor(0, 1);
   lcd.print(line_buf);
 
+  auto time_since_active = st_clock.now() - last_activity;
+  int hours = std::chrono::duration_cast<std::chrono::hours>(time_since_active).count();
+  int minutes = std::chrono::duration_cast<std::chrono::minutes>(time_since_active).count() % 60;
+
   switch (current_state) {
     case CoasterState::IDLE: {
+      snprintf(line_buf, 17, "L:%7.2fg %02d:%02d", float(load), hours, minutes);
+      lcd.setCursor(0, 0);
+      lcd.print(line_buf);
+
       if (button1) {
         current_state = CoasterState::MEASURE_FIRST;
         first_weight = load;
+        last_activity = st_clock.now();
         lcd.setCursor(0, 0);
-        lcd.print("Start");
+        lcd.print("S:");
         mqtt_client.publish(MQTT_TOPIC, "Start");
         Serial.print(mqtt_client.state());
-        delay(1000);
+        delay(2000);
         current_state = CoasterState::FIRST_COMPLETE;
+      }
+      
+      if (button2) {
+        total = 0.0;
+        lcd.setCursor(0, 0);
+        lcd.print("Total cleared.  ");
+        delay(1000);
       }
       break;
     }
 
     case CoasterState::FIRST_COMPLETE: {
+      second_weight = load;
+      double volume = (first_weight - second_weight) / WATER_DENSITY;
+
+      snprintf(line_buf, 17, "D:%6.1lfml %02d:%02d", volume, hours, minutes);
+      lcd.setCursor(0, 0);
+      lcd.print(line_buf);
+
       if (button1) {
         current_state = CoasterState::MEASURE_SECOND;
-        second_weight = load;
-        lcd.setCursor(0, 0);
-        double volume = (first_weight - second_weight) / WATER_DENSITY;
         total += volume;
-        snprintf(line_buf, 17, "Volume: %*.2lfml", 6, volume);
-        lcd.print(line_buf);
+        last_activity = st_clock.now();
+        lcd.setCursor(0, 0);
+        lcd.print("V:");
         mqtt_client.publish(MQTT_TOPIC, line_buf);
         Serial.print(mqtt_client.state());
+        delay(2000);
+        current_state = CoasterState::IDLE;
+      }
+
+      if (button2) {
+        current_state = CoasterState::CANCEL;
+        lcd.setCursor(0, 0);
+        lcd.print("Drink cancelled.");
         delay(1000);
         current_state = CoasterState::IDLE;
       }
@@ -153,18 +207,11 @@ void loop() {
       break;
   }
 
-  if (button2) {
-    total = 0.0;
-  }
-
   if (button3) {
+    lcd.setCursor(0, 0);
+    lcd.print("Calibrating...  ");
     scale.tare();
-  }
-
-  if (button1 | button2 | button3) {
-    digitalWrite(19, HIGH);
-  } else {
-    digitalWrite(19, LOW);
+    delay(1000);
   }
 
   delay(100);
