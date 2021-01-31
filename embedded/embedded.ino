@@ -8,6 +8,9 @@
 
 #include <atomic>
 #include <chrono>
+#include <mutex>
+
+using namespace std::chrono;
 
 LiquidCrystal lcd(18, 5, 17, 16, 4, 2);
 HX711 scale;
@@ -16,18 +19,22 @@ WiFiClient wifi_client;
 PubSubClient mqtt_client { wifi_client };
 
 TaskHandle_t buzzer_task;
-std::chrono::steady_clock st_clock;
-std::chrono::time_point<std::chrono::steady_clock> last_activity;
-constexpr std::chrono::hours MAX_INACTIVE_TIME { 1 };
+steady_clock st_clock;
+time_point<steady_clock> last_activity;
+std::mutex time_mutex;
+
+constexpr hours MAX_INACTIVE_TIME { 1 };
 
 void buzzerTask(void*) {
   bool buzzer_state = LOW;
   while (true) {
+    time_mutex.lock();
     if (st_clock.now() - last_activity > MAX_INACTIVE_TIME) {
       buzzer_state = !buzzer_state;
     } else {
       buzzer_state = LOW;
     }
+    time_mutex.unlock();
 
     digitalWrite(19, buzzer_state);
     delay(1000);
@@ -42,8 +49,10 @@ void loadCellTask(void*) {
     last_load = float(load);
     load = scale.get_units(10);
 
-    if (abs(last_load - load) > 20.0) {
-      last_activity = st_clock.now();
+    if (abs(last_load - load) > 10.0) {
+        time_mutex.lock();
+        last_activity = st_clock.now();
+        time_mutex.unlock();
     }
 
     delay(50);
@@ -137,14 +146,21 @@ void loop() {
 
   char line_buf[17] = {0};
 
-  snprintf(line_buf, 17, "T:%6.1lfml %c:%+3d",
-           total, statusToChar(mqtt_client.state()), WiFi.RSSI());
   lcd.setCursor(0, 1);
-  lcd.print(line_buf);
 
-  auto time_since_active = st_clock.now() - last_activity;
-  int hours = std::chrono::duration_cast<std::chrono::hours>(time_since_active).count();
-  int minutes = std::chrono::duration_cast<std::chrono::minutes>(time_since_active).count() % 60;
+  time_mutex.lock();
+  if (st_clock.now() - last_activity > MAX_INACTIVE_TIME) {
+    lcd.print("Inactive for 1hr");
+  } else {
+    snprintf(line_buf, 17, "T:%6.1lfml %c:%+3d",
+             total, statusToChar(mqtt_client.state()), WiFi.RSSI());
+    lcd.print(line_buf);
+  }
+
+  int min_since_active = duration_cast<minutes>(st_clock.now() - last_activity).count();
+  int hours = min_since_active / 60;
+  int minutes = min_since_active % 60;
+  time_mutex.unlock();
 
   switch (current_state) {
     case CoasterState::IDLE: {
@@ -155,7 +171,6 @@ void loop() {
       if (button1) {
         current_state = CoasterState::MEASURE_FIRST;
         first_weight = load;
-        last_activity = st_clock.now();
         lcd.setCursor(0, 0);
         lcd.print("S:");
         mqtt_client.publish(MQTT_TOPIC, "Start");
@@ -184,7 +199,6 @@ void loop() {
       if (button1) {
         current_state = CoasterState::MEASURE_SECOND;
         total += volume;
-        last_activity = st_clock.now();
         lcd.setCursor(0, 0);
         lcd.print("V:");
         mqtt_client.publish(MQTT_TOPIC, line_buf);
