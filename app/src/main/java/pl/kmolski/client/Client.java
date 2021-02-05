@@ -3,6 +3,8 @@ package pl.kmolski.client;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
+import java.util.Date;
+
 public class Client {
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
@@ -18,7 +20,8 @@ public class Client {
         System.out.println("Connected to host " + client.getServerURI() +"!");
 
         client.subscribe(args[1], (topic, msg) -> {
-            System.out.println("New message on topic `" + topic + "`: " + msg);
+            var date = new Date();
+            System.out.println("[" + date.toString() + "] New message on topic `" + topic + "`: " + msg);
         });
     }
 }
