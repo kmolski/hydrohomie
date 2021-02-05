@@ -43,9 +43,14 @@ void buzzerTask(void*) {
 
 TaskHandle_t load_cell_task;
 std::atomic<float> last_load, load;
+std::atomic<bool> request_tare { false };
 
 void loadCellTask(void*) {
   while (true) {
+    bool tare_requested = true;
+    request_tare.compare_exchange_strong(tare_requested, false);
+    if (tare_requested) { scale.tare(); }
+
     last_load = float(load);
     load = scale.get_units(10);
 
@@ -174,7 +179,7 @@ void loop() {
         lcd.setCursor(0, 0);
         lcd.print("S:");
         mqtt_client.publish(MQTT_TOPIC, "Start");
-        Serial.print(mqtt_client.state());
+        Serial.println(mqtt_client.state());
         delay(2000);
         current_state = CoasterState::FIRST_COMPLETE;
       }
@@ -202,7 +207,7 @@ void loop() {
         lcd.setCursor(0, 0);
         lcd.print("V:");
         mqtt_client.publish(MQTT_TOPIC, line_buf);
-        Serial.print(mqtt_client.state());
+        Serial.println(mqtt_client.state());
         delay(2000);
         current_state = CoasterState::IDLE;
       }
@@ -224,7 +229,7 @@ void loop() {
   if (button3) {
     lcd.setCursor(0, 0);
     lcd.print("Calibrating...  ");
-    scale.tare();
+    request_tare = true;
     delay(1000);
   }
 
