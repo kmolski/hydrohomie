@@ -74,7 +74,7 @@ enum class CoasterState {
   STORE_RESULT
 };
 
-std::atomic<CoasterState> current_state { CoasterState::IDLE };
+CoasterState current_state { CoasterState::IDLE };
 std::atomic<bool> button1 { false }, button2 { false }, button3 { false };
 double first_weight = 0.0, second_weight = 0.0, total = 0.0;
 
