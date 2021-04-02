@@ -18,6 +18,9 @@ HX711 scale;
 WiFiClient wifi_client;
 PubSubClient mqtt_client { wifi_client };
 
+constexpr size_t DEVICE_NAME_SIZE = 64;
+char device_name[DEVICE_NAME_SIZE] = { 0 };
+
 TaskHandle_t buzzer_task;
 steady_clock st_clock;
 time_point<steady_clock> last_activity;
@@ -118,6 +121,13 @@ void setup() {
 
   xTaskCreatePinnedToCore(loadCellTask, "load cell task", 1000, NULL, 1, &load_cell_task, 0);
 
+  byte mac[6] = { 0 };
+  WiFi.macAddress(mac);
+  snprintf(device_name, DEVICE_NAME_SIZE, "esp32-%x%x%x%x%x%x",
+           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
+  Serial.println(device_name);
+
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
@@ -140,7 +150,7 @@ char statusToChar(int state) {
 void loop() {
   while (!mqtt_client.connected()) {
     Serial.println("trying to reconnect");
-    if (mqtt_client.connect("esp32")) {
+    if (mqtt_client.connect(device_name)) {
       Serial.println("connected to MQTT broker");
     } else {
       Serial.println("trying again");
