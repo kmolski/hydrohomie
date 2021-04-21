@@ -112,15 +112,15 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(27), button1ISR, CHANGE);
 
     // Load cell calibration code
-    //  scale.set_scale();
-    //  scale.tare();
-    //  lcd.setCursor(0, 0);
-    //  lcd.print("Place a weight and press S1.");
-    //  while (digitalRead(27) == HIGH);
+    // scale.set_scale();
+    // scale.tare();
+    // lcd.setCursor(0, 0);
+    // lcd.print("Place a weight and press S1.");
+    // while (digitalRead(27) == HIGH);
     //
-    //  lcd.setCursor(0, 0);
-    //  lcd.print(scale.get_units(10));
-    //  while (digitalRead(27) == HIGH);
+    // lcd.setCursor(0, 0);
+    // lcd.print(scale.get_units(10));
+    // while (digitalRead(27) == HIGH);
 
     scale.set_scale(-867.8136055);
     scale.tare();
@@ -162,8 +162,8 @@ void loop() {
             Serial.println("connected to MQTT broker");
 
             JsonDoc doc;
-            doc["device_name"] = device_name;
-            doc["message_type"] = "connected";
+            doc["device"] = device_name;
+            doc["type"] = "connected";
 
             size_t bytes = serializeJson(doc, json_bytes);
             mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
@@ -181,13 +181,6 @@ void loop() {
     time_mutex.lock();
     if (st_clock.now() - last_activity > MAX_INACTIVE_TIME) {
         lcd.print("Inactive for 1hr");
-
-        JsonDoc doc;
-        doc["device_name"] = device_name;
-        doc["message_type"] = "inactive";
-
-        size_t bytes = serializeJson(doc, json_bytes);
-        mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
     } else {
         snprintf(line_buf, 17, "T:%6.1lfml %c:%+3d", total, statusToChar(mqtt_client.state()),
                  WiFi.RSSI());
@@ -212,9 +205,9 @@ void loop() {
                 lcd.print("S:");
 
                 JsonDoc doc;
-                doc["device_name"] = device_name;
-                doc["message_type"] = "start";
-                doc["first_weight"] = first_weight;
+                doc["device"] = device_name;
+                doc["type"] = "begin";
+                doc["load"] = first_weight;
 
                 size_t bytes = serializeJson(doc, json_bytes);
                 mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
@@ -228,14 +221,6 @@ void loop() {
                 total = 0.0;
                 lcd.setCursor(0, 0);
                 lcd.print("Total cleared.  ");
-
-                JsonDoc doc;
-                doc["device_name"] = device_name;
-                doc["message_type"] = "clear_total";
-
-                size_t bytes = serializeJson(doc, json_bytes);
-                mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
-
                 delay(1000);
             }
             break;
@@ -256,8 +241,8 @@ void loop() {
                 lcd.print("V:");
 
                 JsonDoc doc;
-                doc["device_name"] = device_name;
-                doc["message_type"] = "finish";
+                doc["device"] = device_name;
+                doc["type"] = "end";
                 doc["volume"] = volume;
 
                 size_t bytes = serializeJson(doc, json_bytes);
@@ -274,8 +259,8 @@ void loop() {
                 lcd.print("Drink cancelled.");
 
                 JsonDoc doc;
-                doc["device_name"] = device_name;
-                doc["message_type"] = "cancel";
+                doc["device"] = device_name;
+                doc["type"] = "cancel";
 
                 size_t bytes = serializeJson(doc, json_bytes);
                 mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);

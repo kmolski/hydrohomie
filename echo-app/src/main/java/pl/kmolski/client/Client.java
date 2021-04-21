@@ -21,7 +21,7 @@ public class Client {
 
         client.subscribe(args[1], (topic, msg) -> {
             var date = new Date();
-            System.out.println("[" + date.toString() + "] New message on topic `" + topic + "`: " + msg);
+            System.out.println("[" + date.toString() + "] On topic '" + topic + "': " + msg);
         });
     }
 }
