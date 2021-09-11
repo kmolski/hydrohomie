@@ -11,11 +11,8 @@ public class Coaster {
 
     @Id
     private final String deviceName;
-
     private String displayName;
-
     private String description;
-
     private String place;
 
     public Coaster(String deviceName) {
