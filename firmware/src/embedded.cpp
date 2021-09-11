@@ -256,11 +256,11 @@ void loop() {
             if (button2) {
                 current_state = CoasterState::CANCEL;
                 lcd.setCursor(0, 0);
-                lcd.print("Drink cancelled.");
+                lcd.print("Drink discarded.");
 
                 JsonDoc doc;
                 doc["device"] = device_name;
-                doc["type"] = "cancel";
+                doc["type"] = "discard";
 
                 size_t bytes = serializeJson(doc, json_bytes);
                 mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
