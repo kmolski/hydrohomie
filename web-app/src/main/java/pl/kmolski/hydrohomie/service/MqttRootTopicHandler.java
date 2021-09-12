@@ -1,30 +1,34 @@
 package pl.kmolski.hydrohomie.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHandler;
+import org.springframework.integration.handler.GenericHandler;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Component;
-import pl.kmolski.hydrohomie.model.Message.ConnectedMessage;
+import pl.kmolski.hydrohomie.model.Coaster;
+import pl.kmolski.hydrohomie.model.CoasterMessage.ConnectedMessage;
+import pl.kmolski.hydrohomie.repo.CoasterRepository;
 
 @Component
-public class MqttRootTopicHandler implements MessageHandler {
+public class MqttRootTopicHandler implements GenericHandler<ConnectedMessage> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MqttRootTopicHandler.class);
 
+    private final CoasterRepository coasterRepository;
+
+    MqttRootTopicHandler(CoasterRepository coasterRepository) {
+        this.coasterRepository = coasterRepository;
+    }
+
     @Override
-    public void handleMessage(Message<?> message) throws MessagingException {
-        LOGGER.info("Received: " + message.getPayload());
+    public Object handle(ConnectedMessage message, MessageHeaders headers) throws MessagingException {
+        LOGGER.debug("Received message on root topic: {}", message);
 
-        var mapper = new ObjectMapper();
-        var connectedMessage = new ConnectedMessage("foo");
+        var deviceName = message.device();
+        coasterRepository.findById(deviceName)
+                         .switchIfEmpty(coasterRepository.save(new Coaster(deviceName)))
+                         .block();
 
-        try {
-            LOGGER.info("Mapped message: " + mapper.writeValueAsString(connectedMessage));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        return null;
     }
 }

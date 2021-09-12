@@ -2,6 +2,7 @@ package pl.kmolski.hydrohomie.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.lang.NonNull;
 
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -15,7 +16,7 @@ public class Coaster {
     private String description;
     private String place;
 
-    public Coaster(String deviceName) {
+    public Coaster(@NonNull String deviceName) {
         this.deviceName = deviceName;
     }
 

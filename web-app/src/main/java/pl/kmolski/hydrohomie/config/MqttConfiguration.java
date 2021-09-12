@@ -8,10 +8,17 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
+import org.springframework.integration.mqtt.support.MqttHeaders;
+import org.springframework.messaging.MessageHeaders;
+import pl.kmolski.hydrohomie.model.CoasterMessage.ConnectedMessage;
+import pl.kmolski.hydrohomie.model.CoasterMessage.DeviceTopicMessage;
+import pl.kmolski.hydrohomie.service.MqttDeviceTopicHandler;
 import pl.kmolski.hydrohomie.service.MqttRootTopicHandler;
 
 @Configuration
 public class MqttConfiguration {
+
+    private static final String DEVICE_TOPIC_SUFFIX = "/device/";
 
     @Bean
     public MqttPahoClientFactory mqttPahoClientFactory(MqttClientSettings settings) {
@@ -25,10 +32,29 @@ public class MqttConfiguration {
     }
 
     @Bean
-    public IntegrationFlow mqttInbound(MqttClientSettings settings, MqttPahoClientFactory clientFactory,
-                                       MqttRootTopicHandler handler) {
+    public MqttPahoMessageDrivenChannelAdapter mqttChannelAdapter(MqttClientSettings settings,
+                                                                  MqttPahoClientFactory clientFactory) {
+        var rootTopic = settings.getTopic();
+        var deviceTopic = rootTopic + DEVICE_TOPIC_SUFFIX + "+";
 
-        var channelAdapter = new MqttPahoMessageDrivenChannelAdapter("web-app", clientFactory, settings.getTopic());
-        return IntegrationFlows.from(channelAdapter).handle(handler).get();
+        return new MqttPahoMessageDrivenChannelAdapter("web-app", clientFactory, rootTopic, deviceTopic);
+    }
+
+    @Bean
+    public IntegrationFlow mqttInbound(MqttPahoMessageDrivenChannelAdapter adapter) {
+        return IntegrationFlows.from(adapter)
+                .enrichHeaders(h -> h.header(MessageHeaders.CONTENT_TYPE, "application/json"))
+                .route("headers['" + MqttHeaders.RECEIVED_TOPIC + "'].contains('device') ? 'device' : 'root'")
+                .get();
+    }
+
+    @Bean
+    public IntegrationFlow mqttRootTopicFlow(MqttRootTopicHandler rootTopicHandler) {
+        return IntegrationFlows.from("root").handle(ConnectedMessage.class, rootTopicHandler).get();
+    }
+
+    @Bean
+    public IntegrationFlow mqttDeviceTopicFlow(MqttDeviceTopicHandler deviceTopicHandler) {
+        return IntegrationFlows.from("device").handle(DeviceTopicMessage.class, deviceTopicHandler).get();
     }
 }

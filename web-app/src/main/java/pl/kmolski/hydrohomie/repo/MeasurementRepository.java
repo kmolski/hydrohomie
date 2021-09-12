@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 public interface MeasurementRepository extends ReactiveCrudRepository<Measurement, Integer> {
 
-    Flux<Measurement> findByDeviceNameAndTimestampBetween(
-        String deviceName, LocalDateTime startTimestamp, LocalDateTime endTimestamp
-    );
+    Flux<Measurement> findByDeviceNameAndTimestampBetween(String deviceName, LocalDateTime startTimestamp,
+                                                          LocalDateTime endTimestamp);
 }

@@ -19,11 +19,15 @@ HX711 scale;
 WiFiClient wifi_client;
 PubSubClient mqtt_client{wifi_client};
 
-constexpr size_t DEVICE_NAME_SIZE = 64;
-char device_name[DEVICE_NAME_SIZE] = {0};
+constexpr size_t DEVICE_NAME_LEN = 128;
+char device_name[DEVICE_NAME_LEN] = {0};
 
-constexpr size_t JSON_DOC_SIZE = 256;
-using JsonDoc = StaticJsonDocument<JSON_DOC_SIZE>;
+constexpr char MQTT_DEVICE_TOPIC_SUFFIX[] = "/device/";
+constexpr size_t DEVICE_TOPIC_LEN = strlen(MQTT_TOPIC) + strlen(MQTT_DEVICE_TOPIC_SUFFIX) + DEVICE_NAME_LEN;
+char device_topic[DEVICE_TOPIC_LEN] = {0};
+
+constexpr size_t JSON_DOC_LEN = 256;
+using JsonDoc = StaticJsonDocument<JSON_DOC_LEN>;
 
 TaskHandle_t buzzer_task;
 steady_clock st_clock;
@@ -77,7 +81,7 @@ enum class CoasterState {
     IDLE,
     MEASURE_FIRST,
     FIRST_COMPLETE,
-    CANCEL,
+    DISCARD,
     MEASURE_SECOND,
     SECOND_COMPLETE,
     STORE_RESULT
@@ -85,16 +89,16 @@ enum class CoasterState {
 
 CoasterState current_state{CoasterState::IDLE};
 std::atomic<bool> button1{false}, button2{false}, button3{false};
-double first_weight = 0.0, second_weight = 0.0, total = 0.0;
+float first_weight = 0.0, second_weight = 0.0, total = 0.0;
 
-constexpr double WATER_DENSITY = 0.9975415;
+constexpr float WATER_DENSITY = 0.9975415;
 
 void IRAM_ATTR button1ISR() { button1 = (digitalRead(27) == LOW); }
 void IRAM_ATTR button2ISR() { button2 = (digitalRead(26) == LOW); }
 void IRAM_ATTR button3ISR() { button3 = (digitalRead(25) == LOW); }
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     lcd.begin(16, 2);
     scale.begin(32, 33);
@@ -129,10 +133,11 @@ void setup() {
 
     byte mac[6] = {0};
     WiFi.macAddress(mac);
-    snprintf(device_name, DEVICE_NAME_SIZE, "esp32-%x%x%x%x%x%x", mac[0], mac[1], mac[2], mac[3],
-             mac[4], mac[5]);
-
+    snprintf(device_name, DEVICE_NAME_LEN, "esp32-%x%x%x%x%x%x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     Serial.println(device_name);
+
+    snprintf(device_topic, DEVICE_TOPIC_LEN, "%s%s%s", MQTT_TOPIC, MQTT_DEVICE_TOPIC_SUFFIX, device_name);
+    Serial.println(device_topic);
 
     WiFi.begin(WIFI_SSID, WIFI_PASS);
     while (WiFi.status() != WL_CONNECTED) {
@@ -210,7 +215,7 @@ void loop() {
                 doc["load"] = first_weight;
 
                 size_t bytes = serializeJson(doc, json_bytes);
-                mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
+                mqtt_client.publish(device_topic, json_bytes, bytes);
 
                 Serial.println(mqtt_client.state());
                 delay(2000);
@@ -228,7 +233,7 @@ void loop() {
 
         case CoasterState::FIRST_COMPLETE: {
             second_weight = load;
-            double volume = (first_weight - second_weight) / WATER_DENSITY;
+            float volume = (first_weight - second_weight) / WATER_DENSITY;
 
             snprintf(line_buf, 17, "D:%6.1lfml %02d:%02d", volume, hours, minutes);
             lcd.setCursor(0, 0);
@@ -246,7 +251,7 @@ void loop() {
                 doc["volume"] = volume;
 
                 size_t bytes = serializeJson(doc, json_bytes);
-                mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
+                mqtt_client.publish(device_topic, json_bytes, bytes);
 
                 Serial.println(mqtt_client.state());
                 delay(2000);
@@ -254,7 +259,7 @@ void loop() {
             }
 
             if (button2) {
-                current_state = CoasterState::CANCEL;
+                current_state = CoasterState::DISCARD;
                 lcd.setCursor(0, 0);
                 lcd.print("Drink discarded.");
 
@@ -263,7 +268,7 @@ void loop() {
                 doc["type"] = "discard";
 
                 size_t bytes = serializeJson(doc, json_bytes);
-                mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
+                mqtt_client.publish(device_topic, json_bytes, bytes);
 
                 delay(1000);
                 current_state = CoasterState::IDLE;
