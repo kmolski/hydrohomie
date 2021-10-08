@@ -9,6 +9,7 @@ public class MqttClientSettings {
 
     private String url;
     private String topic;
+    private String clientId;
 
     public String getUrl() {
         return url;
@@ -24,5 +25,13 @@ public class MqttClientSettings {
 
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 }
