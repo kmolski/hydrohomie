@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 
 public interface CoasterRepository extends ReactiveCrudRepository<Coaster, String> {
     @NonNull
-    @Override
     @Query("insert into coasters(device_name) values (:device_name)")
-    <S extends Coaster> Mono<S> save(@NonNull S coaster);
+    <S extends Coaster> Mono<S> create(@NonNull String deviceName);
 }
