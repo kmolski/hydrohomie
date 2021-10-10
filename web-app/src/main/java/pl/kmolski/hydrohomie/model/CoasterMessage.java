@@ -21,10 +21,12 @@ public sealed interface CoasterMessage {
     record ConnectedMessage(String device) implements CoasterMessage {}
 
     sealed interface DeviceTopicMessage extends CoasterMessage {}
-    record ListeningMessage(String device, float initTotal) implements DeviceTopicMessage {}
-    record HeartbeatMessage(String device, float load, int inactiveSeconds) implements DeviceTopicMessage {}
+    record HeartbeatMessage(String device, int inactiveSeconds) implements DeviceTopicMessage {}
+    record ListeningMessage(String device, Float initLoad, float initTotal) implements DeviceTopicMessage {}
 
     record BeginMessage(String device, float load) implements DeviceTopicMessage {}
     record EndMessage(String device, float volume) implements DeviceTopicMessage {}
     record DiscardMessage(String device) implements DeviceTopicMessage {}
+
+    String device();
 }
