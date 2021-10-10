@@ -10,8 +10,8 @@ import pl.kmolski.hydrohomie.repo.MeasurementRepository;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 @Component
 @Transactional
@@ -38,7 +38,7 @@ public class CoasterService {
                 .zipWith(measurementRepository.findDailySumVolumeByDeviceName(deviceName, LocalDate.now()));
     }
 
-    public Mono<? extends Coaster> updateCoasterInactivity(String deviceName, ZonedDateTime inactiveSince) {
+    public Mono<? extends Coaster> updateCoasterInactivity(String deviceName, Instant inactiveSince) {
         return getCoasterEntity(deviceName)
                 .map(coaster -> coaster.setInactiveSince(inactiveSince))
                 .flatMap(coasterRepository::save);
@@ -46,7 +46,7 @@ public class CoasterService {
 
     public Mono<Coaster> updateCoasterInitLoad(String deviceName, float initLoad) {
         return getCoasterEntity(deviceName)
-                .map(coaster -> coaster.setInitLoad(initLoad).setInactiveSince(ZonedDateTime.now()))
+                .map(coaster -> coaster.setInitLoad(initLoad).setInactiveSince(Instant.now()))
                 .flatMap(coasterRepository::save);
     }
 

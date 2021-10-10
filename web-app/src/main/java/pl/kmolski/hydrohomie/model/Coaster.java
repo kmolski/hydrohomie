@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.lang.NonNull;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -18,7 +18,7 @@ public class Coaster {
     private String place;
 
     private Float initLoad;
-    private ZonedDateTime inactiveSince;
+    private Instant inactiveSince;
 
     public Coaster(@NonNull String deviceName) {
         this.deviceName = deviceName;
@@ -64,11 +64,11 @@ public class Coaster {
         return this;
     }
 
-    public ZonedDateTime getInactiveSince() {
+    public Instant getInactiveSince() {
         return inactiveSince;
     }
 
-    public Coaster setInactiveSince(ZonedDateTime inactiveSince) {
+    public Coaster setInactiveSince(Instant inactiveSince) {
         this.inactiveSince = inactiveSince;
         return this;
     }

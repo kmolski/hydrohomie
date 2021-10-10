@@ -13,7 +13,7 @@ import pl.kmolski.hydrohomie.model.CoasterMessage.HeartbeatMessage;
 import pl.kmolski.hydrohomie.model.Measurement;
 import pl.kmolski.hydrohomie.repo.MeasurementRepository;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 import static pl.kmolski.hydrohomie.model.CoasterMessage.*;
 
@@ -37,12 +37,12 @@ public class MqttDeviceTopicHandler implements GenericHandler<DeviceTopicMessage
 
         var deviceName = message.device();
         if (message instanceof HeartbeatMessage heartbeat) {
-            var inactiveSince = ZonedDateTime.now().minusSeconds(heartbeat.inactiveSeconds());
+            var inactiveSince = Instant.now().minusSeconds(heartbeat.inactiveSeconds());
             coasterService.updateCoasterInactivity(deviceName, inactiveSince).block();
         } else if (message instanceof BeginMessage begin) {
             coasterService.updateCoasterInitLoad(deviceName, begin.load()).block();
         } else if (message instanceof EndMessage end) {
-            var measurement = new Measurement(null, message.device(), end.volume(), ZonedDateTime.now());
+            var measurement = new Measurement(null, message.device(), end.volume(), Instant.now());
             coasterService.resetCoasterState(deviceName).then(measurementRepository.save(measurement)).block();
         } else if (message instanceof DiscardMessage) {
             coasterService.resetCoasterState(deviceName).block();
