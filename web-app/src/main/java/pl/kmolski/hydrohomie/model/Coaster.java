@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.lang.NonNull;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -15,6 +16,9 @@ public class Coaster {
     private String displayName;
     private String description;
     private String place;
+
+    private Float initLoad;
+    private ZonedDateTime inactiveSince;
 
     public Coaster(@NonNull String deviceName) {
         this.deviceName = deviceName;
@@ -28,24 +32,45 @@ public class Coaster {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
+    public Coaster setDisplayName(String displayName) {
         this.displayName = displayName;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public Coaster setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public String getPlace() {
         return place;
     }
 
-    public void setPlace(String place) {
+    public Coaster setPlace(String place) {
         this.place = place;
+        return this;
+    }
+
+    public Float getInitLoad() {
+        return initLoad;
+    }
+
+    public Coaster setInitLoad(Float initLoad) {
+        this.initLoad = initLoad;
+        return this;
+    }
+
+    public ZonedDateTime getInactiveSince() {
+        return inactiveSince;
+    }
+
+    public Coaster setInactiveSince(ZonedDateTime inactiveSince) {
+        this.inactiveSince = inactiveSince;
+        return this;
     }
 
     @Override
@@ -68,6 +93,7 @@ public class Coaster {
                 .add("displayName='" + displayName + "'")
                 .add("description='" + description + "'")
                 .add("place='" + place + "'")
+                .add("inactiveSince='" + inactiveSince + "'")
                 .toString();
     }
 }
