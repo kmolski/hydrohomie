@@ -12,6 +12,8 @@ import pl.kmolski.hydrohomie.config.MqttClientSettings;
 import pl.kmolski.hydrohomie.model.CoasterMessage.ConnectedMessage;
 import pl.kmolski.hydrohomie.model.CoasterMessage.ListeningMessage;
 
+import java.time.LocalDate;
+
 import static pl.kmolski.hydrohomie.config.MqttConfiguration.DEVICE_TOPIC_SUFFIX;
 
 @Component
@@ -32,7 +34,7 @@ public class MqttRootTopicHandler implements GenericHandler<ConnectedMessage> {
         LOGGER.debug("Received message on root topic {}: {}", headers.get(MqttHeaders.RECEIVED_TOPIC), message);
 
         var deviceName = message.device();
-        return coasterService.getCoasterAndDailySumVolume(deviceName)
+        return coasterService.getCoasterAndDailySumVolume(deviceName, LocalDate.now())
                 .map(coasterAndTotal -> {
                     var coaster = coasterAndTotal.getT1();
                     var initTotal = coasterAndTotal.getT2();

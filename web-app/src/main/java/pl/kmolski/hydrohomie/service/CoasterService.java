@@ -33,9 +33,9 @@ public class CoasterService {
                 .switchIfEmpty(coasterRepository.create(deviceName));
     }
 
-    public Mono<Tuple2<Coaster, Float>> getCoasterAndDailySumVolume(String deviceName) {
+    public Mono<Tuple2<Coaster, Float>> getCoasterAndDailySumVolume(String deviceName, LocalDate date) {
         return getCoasterEntity(deviceName)
-                .zipWith(measurementRepository.findDailySumVolumeByDeviceName(deviceName, LocalDate.now()));
+                .zipWith(measurementRepository.findDailySumVolumeByDeviceName(deviceName, date));
     }
 
     public Mono<? extends Coaster> updateCoasterInactivity(String deviceName, Instant inactiveSince) {
@@ -44,9 +44,9 @@ public class CoasterService {
                 .flatMap(coasterRepository::save);
     }
 
-    public Mono<Coaster> updateCoasterInitLoad(String deviceName, float initLoad) {
+    public Mono<Coaster> updateCoasterInitLoad(String deviceName, float initLoad, Instant currentTime) {
         return getCoasterEntity(deviceName)
-                .map(coaster -> coaster.setInitLoad(initLoad).setInactiveSince(Instant.now()))
+                .map(coaster -> coaster.setInitLoad(initLoad).setInactiveSince(currentTime))
                 .flatMap(coasterRepository::save);
     }
 

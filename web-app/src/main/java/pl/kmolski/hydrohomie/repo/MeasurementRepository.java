@@ -7,13 +7,12 @@ import pl.kmolski.hydrohomie.model.Measurement;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 public interface MeasurementRepository extends ReactiveCrudRepository<Measurement, Integer> {
 
-    Flux<Measurement> findByDeviceNameAndTimestampBetween(String deviceName, ZonedDateTime startTimestamp,
-                                                          ZonedDateTime endTimestamp);
+    Flux<Measurement> findByDeviceNameAndTimestampBetween(String deviceName, Instant startTimestamp, Instant endTimestamp);
 
     @NonNull
     @Query("select coalesce(sum(volume), 0) from measurements where device_name = :device and date(timestamp) = :date")

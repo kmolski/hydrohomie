@@ -40,7 +40,7 @@ public class MqttDeviceTopicHandler implements GenericHandler<DeviceTopicMessage
             var inactiveSince = Instant.now().minusSeconds(heartbeat.inactiveSeconds());
             coasterService.updateCoasterInactivity(deviceName, inactiveSince).block();
         } else if (message instanceof BeginMessage begin) {
-            coasterService.updateCoasterInitLoad(deviceName, begin.load()).block();
+            coasterService.updateCoasterInitLoad(deviceName, begin.load(), Instant.now()).block();
         } else if (message instanceof EndMessage end) {
             var measurement = new Measurement(null, message.device(), end.volume(), Instant.now());
             coasterService.resetCoasterState(deviceName).then(measurementRepository.save(measurement)).block();
