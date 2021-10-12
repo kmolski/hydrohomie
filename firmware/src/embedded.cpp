@@ -53,7 +53,7 @@ void buzzerTask(void *) {
 }
 
 TaskHandle_t load_cell_task;
-std::atomic<float> last_load, load;
+std::atomic<float> last_load, load, total{0.0}, first_weight{0.0};
 std::atomic<bool> request_tare{false};
 
 void loadCellTask(void *) {
@@ -77,19 +77,28 @@ void loadCellTask(void *) {
     }
 }
 
-enum class CoasterState {
-    IDLE,
-    MEASURE_FIRST,
-    FIRST_COMPLETE,
-    DISCARD,
-    MEASURE_SECOND,
-    SECOND_COMPLETE,
-    STORE_RESULT
-};
+enum class CoasterState { IDLE, MEASURE_FIRST, FIRST_COMPLETE, DISCARD, MEASURE_SECOND, SECOND_COMPLETE, STORE_RESULT };
 
 CoasterState current_state{CoasterState::IDLE};
 std::atomic<bool> button1{false}, button2{false}, button3{false};
-float first_weight = 0.0, second_weight = 0.0, total = 0.0;
+float second_weight = 0.0;
+
+void subscriptionCallback(char topic[], byte *payload, unsigned int length) {
+    JsonDoc doc;
+    if (strcmp(topic, device_topic) == 0) {
+        deserializeJson(doc, payload, length);
+        const char *message_type = doc["type"].as<char *>();
+        if (strcmp("listening", message_type) == 0) {
+            total = doc["initTotal"].as<float>();
+
+            JsonVariant init_load = doc["initLoad"].as<JsonVariant>();
+            if (!init_load.isNull()) {
+                current_state = CoasterState::FIRST_COMPLETE;
+                first_weight = init_load.as<float>();
+            }
+        }
+    }
+}
 
 constexpr float WATER_DENSITY = 0.9975415;
 
@@ -145,6 +154,7 @@ void setup() {
     }
 
     mqtt_client.setServer(MQTT_SERVER_IP, 1883);
+    mqtt_client.setCallback(subscriptionCallback);
 }
 
 char statusToChar(int state) {
@@ -165,6 +175,7 @@ void loop() {
         Serial.println("trying to reconnect");
         if (mqtt_client.connect(device_name)) {
             Serial.println("connected to MQTT broker");
+            mqtt_client.subscribe(device_topic);
 
             JsonDoc doc;
             doc["device"] = device_name;
@@ -187,8 +198,7 @@ void loop() {
     if (st_clock.now() - last_activity > MAX_INACTIVE_TIME) {
         lcd.print("Inactive for 1hr");
     } else {
-        snprintf(line_buf, 17, "T:%6.1lfml %c:%+3d", total, statusToChar(mqtt_client.state()),
-                 WiFi.RSSI());
+        snprintf(line_buf, 17, "T:%6.1lfml %c:%+3d", float(total), statusToChar(mqtt_client.state()), WiFi.RSSI());
         lcd.print(line_buf);
     }
 
@@ -205,14 +215,14 @@ void loop() {
 
             if (button1) {
                 current_state = CoasterState::MEASURE_FIRST;
-                first_weight = load;
+                first_weight = float(load);
                 lcd.setCursor(0, 0);
                 lcd.print("S:");
 
                 JsonDoc doc;
                 doc["device"] = device_name;
                 doc["type"] = "begin";
-                doc["load"] = first_weight;
+                doc["load"] = float(first_weight);
 
                 size_t bytes = serializeJson(doc, json_bytes);
                 mqtt_client.publish(device_topic, json_bytes, bytes);
@@ -241,7 +251,13 @@ void loop() {
 
             if (button1) {
                 current_state = CoasterState::MEASURE_SECOND;
-                total += volume;
+
+                float old_total = float(total);
+                float new_total = old_total + volume;
+                while (!total.compare_exchange_strong(old_total, new_total)) {
+                    new_total = old_total + volume;
+                }
+
                 lcd.setCursor(0, 0);
                 lcd.print("V:");
 

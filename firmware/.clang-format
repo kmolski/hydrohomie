@@ -1,6 +1,6 @@
 ﻿---
 BasedOnStyle: LLVM
-ColumnLimit: '100'
+ColumnLimit: '120'
 IndentCaseLabels: 'true'
 IndentWidth: '4'
 TabWidth: '4'
