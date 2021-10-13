@@ -9,12 +9,15 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 public interface MeasurementRepository extends ReactiveCrudRepository<Measurement, Integer> {
 
     Flux<Measurement> findByDeviceNameAndTimestampBetween(String deviceName, Instant startTimestamp, Instant endTimestamp);
 
     @NonNull
-    @Query("select coalesce(sum(volume), 0) from measurements where device_name = :device and date(timestamp) = :date")
-    Mono<Float> findDailySumVolumeByDeviceName(@NonNull String device, @NonNull LocalDate date);
+    @Query("""
+        select coalesce(sum(volume), 0) from measurements
+        where device_name = :device and date(timestamp at time zone :tz) = :date""")
+    Mono<Float> findDailySumVolumeByDeviceName(@NonNull String device, @NonNull LocalDate date, @NonNull ZoneId tz);
 }

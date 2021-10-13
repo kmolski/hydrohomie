@@ -6,8 +6,10 @@ import org.springframework.lang.NonNull;
 import pl.kmolski.hydrohomie.model.Coaster;
 import reactor.core.publisher.Mono;
 
+import java.time.ZoneId;
+
 public interface CoasterRepository extends ReactiveCrudRepository<Coaster, String> {
     @NonNull
-    @Query("insert into coasters(device_name) values (:device_name)")
-    <S extends Coaster> Mono<S> create(@NonNull String deviceName);
+    @Query("insert into coasters(device_name, timezone) values (:device_name, :timezone)")
+    <S extends Coaster> Mono<S> create(@NonNull String deviceName, @NonNull ZoneId timezone);
 }

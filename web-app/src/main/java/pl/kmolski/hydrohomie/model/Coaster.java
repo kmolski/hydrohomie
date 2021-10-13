@@ -5,6 +5,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.lang.NonNull;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -15,6 +16,7 @@ public class Coaster {
     private final String deviceName;
     private String displayName;
     private String description;
+    private ZoneId timezone;
     private String place;
 
     private Float initLoad;
@@ -43,6 +45,15 @@ public class Coaster {
 
     public Coaster setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public ZoneId getTimezone() {
+        return timezone;
+    }
+
+    public Coaster setTimezone(ZoneId timezone) {
+        this.timezone = timezone;
         return this;
     }
 
@@ -92,8 +103,10 @@ public class Coaster {
                 .add("deviceName='" + deviceName + "'")
                 .add("displayName='" + displayName + "'")
                 .add("description='" + description + "'")
+                .add("timezone=" + timezone)
                 .add("place='" + place + "'")
-                .add("inactiveSince='" + inactiveSince + "'")
+                .add("initLoad=" + initLoad)
+                .add("inactiveSince=" + inactiveSince)
                 .toString();
     }
 }
