@@ -87,6 +87,7 @@ void subscriptionCallback(char topic[], byte *payload, unsigned int length) {
     JsonDoc doc;
     if (strcmp(topic, device_topic) == 0) {
         deserializeJson(doc, payload, length);
+
         const char *message_type = doc["type"].as<char *>();
         if (strcmp("listening", message_type) == 0) {
             total = doc["initTotal"].as<float>();
@@ -112,17 +113,17 @@ void setup() {
     lcd.begin(16, 2);
     scale.begin(32, 33);
 
-    pinMode(19, OUTPUT);
-    digitalWrite(19, LOW);
-    last_activity = st_clock.now();
-    xTaskCreatePinnedToCore(buzzerTask, "buzzer task", 1000, NULL, 1, &buzzer_task, 0);
-
     pinMode(25, INPUT);
     attachInterrupt(digitalPinToInterrupt(25), button3ISR, CHANGE);
     pinMode(26, INPUT);
     attachInterrupt(digitalPinToInterrupt(26), button2ISR, CHANGE);
     pinMode(27, INPUT);
     attachInterrupt(digitalPinToInterrupt(27), button1ISR, CHANGE);
+
+    pinMode(19, OUTPUT);
+    digitalWrite(19, LOW);
+    last_activity = st_clock.now();
+    xTaskCreatePinnedToCore(buzzerTask, "buzzer task", 1000, NULL, 1, &buzzer_task, 0);
 
     // Load cell calibration code
     // scale.set_scale();
@@ -191,7 +192,6 @@ void loop() {
     mqtt_client.loop();
 
     char line_buf[17] = {0};
-
     lcd.setCursor(0, 1);
 
     time_mutex.lock();
@@ -251,15 +251,14 @@ void loop() {
 
             if (button1) {
                 current_state = CoasterState::MEASURE_SECOND;
+                lcd.setCursor(0, 0);
+                lcd.print("V:");
 
                 float old_total = float(total);
                 float new_total = old_total + volume;
                 while (!total.compare_exchange_strong(old_total, new_total)) {
                     new_total = old_total + volume;
                 }
-
-                lcd.setCursor(0, 0);
-                lcd.print("V:");
 
                 JsonDoc doc;
                 doc["device"] = device_name;
