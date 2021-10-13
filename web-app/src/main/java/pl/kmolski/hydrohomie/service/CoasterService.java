@@ -11,7 +11,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 
 @Component
@@ -34,10 +33,12 @@ public class CoasterService {
                 .switchIfEmpty(coasterRepository.create(deviceName, ZoneId.systemDefault()));
     }
 
-    public Mono<Tuple2<Coaster, Float>> getCoasterAndDailySumVolume(String deviceName, LocalDate date) {
+    public Mono<Tuple2<Coaster, Float>> getCoasterAndDailySumVolume(String deviceName, Instant now) {
         return getCoasterEntity(deviceName)
-                .zipWhen(coaster ->
-                        measurementRepository.findDailySumVolumeByDeviceName(deviceName, date, coaster.getTimezone()));
+                .zipWhen(coaster -> {
+                    var date = now.atZone(coaster.getTimezone()).toLocalDate();
+                    return measurementRepository.findDailySumVolumeForCoaster(deviceName, date, coaster.getTimezone());
+                });
     }
 
     public Mono<Coaster> updateCoasterInactivity(String deviceName, Instant inactiveSince) {

@@ -19,5 +19,5 @@ public interface MeasurementRepository extends ReactiveCrudRepository<Measuremen
     @Query("""
         select coalesce(sum(volume), 0) from measurements
         where device_name = :device and date(timestamp at time zone :tz) = :date""")
-    Mono<Float> findDailySumVolumeByDeviceName(@NonNull String device, @NonNull LocalDate date, @NonNull ZoneId tz);
+    Mono<Float> findDailySumVolumeForCoaster(@NonNull String device, @NonNull LocalDate date, @NonNull ZoneId tz);
 }
