@@ -170,7 +170,7 @@ char statusToChar(int state) {
 }
 
 void loop() {
-    char json_bytes[1024] = {0};
+    byte json_bytes[1024] = {0};
 
     while (!mqtt_client.connected()) {
         Serial.println("trying to reconnect");

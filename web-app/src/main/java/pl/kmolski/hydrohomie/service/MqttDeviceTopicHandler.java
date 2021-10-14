@@ -33,7 +33,7 @@ public class MqttDeviceTopicHandler implements GenericHandler<DeviceTopicMessage
 
     @Override
     public Object handle(DeviceTopicMessage message, MessageHeaders headers) {
-        LOGGER.debug("Received message on device topic {}: {}", headers.get(MqttHeaders.RECEIVED_TOPIC), message);
+        LOGGER.info("Received message on device topic '{}': {}", headers.get(MqttHeaders.RECEIVED_TOPIC), message);
 
         var deviceName = message.device();
         if (message instanceof HeartbeatMessage heartbeat) {
