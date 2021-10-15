@@ -101,6 +101,30 @@ void subscriptionCallback(char topic[], byte *payload, unsigned int length) {
     }
 }
 
+TaskHandle_t heartbeat_task;
+
+void heartbeatTask(void *) {
+    byte json_bytes[1024] = {0};
+
+    while (true) {
+        if (mqtt_client.connected()) {
+            time_mutex.lock();
+            int inactive_seconds = duration_cast<seconds>(st_clock.now() - last_activity).count();
+            time_mutex.unlock();
+
+            JsonDoc doc;
+            doc["device"] = device_name;
+            doc["type"] = "heartbeat";
+            doc["inactiveSeconds"] = inactive_seconds;
+
+            size_t bytes = serializeJson(doc, json_bytes);
+            mqtt_client.publish(device_topic, json_bytes, bytes);
+        }
+
+        delay(2 * 60 * 1000);
+    }
+}
+
 constexpr float WATER_DENSITY = 0.9975415;
 
 void IRAM_ATTR button1ISR() { button1 = (digitalRead(27) == LOW); }
@@ -156,6 +180,8 @@ void setup() {
 
     mqtt_client.setServer(MQTT_SERVER_IP, 1883);
     mqtt_client.setCallback(subscriptionCallback);
+
+    xTaskCreatePinnedToCore(heartbeatTask, "heartbeat task", 4000, NULL, 1, &heartbeat_task, 0);
 }
 
 char statusToChar(int state) {

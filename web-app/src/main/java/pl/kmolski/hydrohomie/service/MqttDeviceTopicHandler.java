@@ -6,16 +6,11 @@ import org.springframework.integration.handler.GenericHandler;
 import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
-import pl.kmolski.hydrohomie.model.CoasterMessage.BeginMessage;
-import pl.kmolski.hydrohomie.model.CoasterMessage.DeviceTopicMessage;
-import pl.kmolski.hydrohomie.model.CoasterMessage.DiscardMessage;
-import pl.kmolski.hydrohomie.model.CoasterMessage.HeartbeatMessage;
+import pl.kmolski.hydrohomie.model.CoasterMessage.*;
 import pl.kmolski.hydrohomie.model.Measurement;
 import pl.kmolski.hydrohomie.repo.MeasurementRepository;
 
 import java.time.Instant;
-
-import static pl.kmolski.hydrohomie.model.CoasterMessage.*;
 
 @Component
 public class MqttDeviceTopicHandler implements GenericHandler<DeviceTopicMessage> {
