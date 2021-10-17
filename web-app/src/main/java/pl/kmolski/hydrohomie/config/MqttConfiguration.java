@@ -43,8 +43,9 @@ public class MqttConfiguration {
                                                                   MqttPahoClientFactory clientFactory) {
         var rootTopic = settings.getTopic();
         var deviceTopic = rootTopic + DEVICE_TOPIC_SUFFIX + "+";
+        var clientId = settings.getClientId() + "-rx";
 
-        return new MqttPahoMessageDrivenChannelAdapter("web-app", clientFactory, rootTopic, deviceTopic);
+        return new MqttPahoMessageDrivenChannelAdapter(clientId, clientFactory, rootTopic, deviceTopic);
     }
 
     @Bean
@@ -58,7 +59,8 @@ public class MqttConfiguration {
     @Bean
     @ServiceActivator(inputChannel = "device-out", async = "true")
     public MessageHandler mqttOutbound(MqttClientSettings settings, MqttPahoClientFactory mqttPahoClientFactory) {
-        return new MqttPahoMessageHandler(settings.getClientId(), mqttPahoClientFactory);
+        var clientId = settings.getClientId() + "-tx";
+        return new MqttPahoMessageHandler(clientId, mqttPahoClientFactory);
     }
 
     @Bean

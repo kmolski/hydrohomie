@@ -10,6 +10,6 @@ import java.time.ZoneId;
 
 public interface CoasterRepository extends ReactiveCrudRepository<Coaster, String> {
     @NonNull
-    @Query("insert into coasters(device_name, timezone) values (:device_name, :timezone)")
+    @Query("insert into coasters(device_name, inactive_since, timezone) values (:device_name, now(), :timezone)")
     <S extends Coaster> Mono<S> create(@NonNull String deviceName, @NonNull ZoneId timezone);
 }
