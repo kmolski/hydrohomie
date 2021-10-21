@@ -241,6 +241,11 @@ void loop() {
 
             if (button1) {
                 current_state = CoasterState::MEASURE_FIRST;
+
+                time_mutex.lock();
+                last_activity = st_clock.now();
+                time_mutex.unlock();
+
                 first_weight = float(load);
                 lcd.setCursor(0, 0);
                 lcd.print("S:");
