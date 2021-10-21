@@ -13,7 +13,7 @@ import java.time.ZoneId;
 
 public interface MeasurementRepository extends ReactiveCrudRepository<Measurement, Integer> {
 
-    Flux<Measurement> findByDeviceNameAndTimestampBetween(String deviceName, Instant startTimestamp, Instant endTimestamp);
+    Flux<Measurement> findByDeviceNameAndTimestampBetween(String deviceName, Instant start, Instant end);
 
     @NonNull
     @Query("""

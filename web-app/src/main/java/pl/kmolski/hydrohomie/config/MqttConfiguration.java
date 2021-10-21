@@ -57,7 +57,7 @@ public class MqttConfiguration {
     }
 
     @Bean
-    @ServiceActivator(inputChannel = "device-out", async = "true")
+    @ServiceActivator(inputChannel = "device-out")
     public MessageHandler mqttOutbound(MqttClientSettings settings, MqttPahoClientFactory mqttPahoClientFactory) {
         var clientId = settings.getClientId() + "-tx";
         return new MqttPahoMessageHandler(clientId, mqttPahoClientFactory);
@@ -66,19 +66,19 @@ public class MqttConfiguration {
     @Bean
     public IntegrationFlow mqttRootTopicFlow(MqttRootTopicHandler rootTopicHandler) {
         return IntegrationFlows.from("root")
-                               .handle(ConnectedMessage.class, rootTopicHandler)
-                               .transform(Transformers.toJson())
-                               .channel("device-out")
-                               .get();
+                .handle(ConnectedMessage.class, rootTopicHandler)
+                .transform(Transformers.toJson())
+                .channel("device-out")
+                .get();
     }
 
     @Bean
     public IntegrationFlow mqttDeviceTopicFlow(MqttDeviceTopicHandler deviceTopicHandler) {
         return IntegrationFlows.from("device-in")
-                               .handle(DeviceTopicMessage.class, deviceTopicHandler)
-                               .transform(Transformers.toJson())
-                               .channel("device-out")
-                               .get();
+                .handle(DeviceTopicMessage.class, deviceTopicHandler)
+                .transform(Transformers.toJson())
+                .channel("device-out")
+                .get();
     }
 
     @Bean(name = "device-out")
