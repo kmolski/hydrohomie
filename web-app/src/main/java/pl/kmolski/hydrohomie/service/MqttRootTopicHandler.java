@@ -12,6 +12,7 @@ import pl.kmolski.hydrohomie.config.MqttClientSettings;
 import pl.kmolski.hydrohomie.model.CoasterMessage.ConnectedMessage;
 import pl.kmolski.hydrohomie.model.CoasterMessage.ListeningMessage;
 
+import java.time.Clock;
 import java.time.Instant;
 
 import static pl.kmolski.hydrohomie.config.MqttConfiguration.DEVICE_TOPIC_SUFFIX;
@@ -23,18 +24,21 @@ public class MqttRootTopicHandler implements GenericHandler<ConnectedMessage> {
 
     private final CoasterService coasterService;
     private final MqttClientSettings mqttClientSettings;
+    private final Clock clock;
 
-    MqttRootTopicHandler(CoasterService coasterService, MqttClientSettings mqttClientSettings) {
+    MqttRootTopicHandler(CoasterService coasterService, MqttClientSettings mqttClientSettings, Clock clock) {
         this.coasterService = coasterService;
         this.mqttClientSettings = mqttClientSettings;
+        this.clock = clock;
     }
 
     @Override
     public Message<ListeningMessage> handle(ConnectedMessage message, MessageHeaders headers) {
-        LOGGER.info("Received message on root topic '{}': {}", headers.get(MqttHeaders.RECEIVED_TOPIC), message);
+        LOGGER.info("Received on root topic '{}': {}", headers.get(MqttHeaders.RECEIVED_TOPIC), message);
 
         var deviceName = message.device();
-        return coasterService.getCoasterAndDailySumVolume(deviceName, Instant.now())
+        var now = Instant.now(clock);
+        return coasterService.getCoasterAndDailySumVolume(deviceName, now)
                 .map(coasterAndTotal -> {
                     var coaster = coasterAndTotal.getT1();
                     var initTotal = coasterAndTotal.getT2();
@@ -42,7 +46,7 @@ public class MqttRootTopicHandler implements GenericHandler<ConnectedMessage> {
                 })
                 .map(response -> {
                     var responseTopic = mqttClientSettings.getTopic() + DEVICE_TOPIC_SUFFIX + deviceName;
-                    LOGGER.info("Sending message to device topic '{}': {}", responseTopic, response);
+                    LOGGER.info("Sending to device topic '{}': {}", responseTopic, response);
 
                     return MessageBuilder.withPayload(response)
                             .copyHeaders(headers)

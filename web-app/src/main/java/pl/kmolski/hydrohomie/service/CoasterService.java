@@ -22,39 +22,40 @@ public class CoasterService {
     private final CoasterRepository coasterRepository;
     private final MeasurementRepository measurementRepository;
 
-    CoasterService(CoasterRepository coasterRepository,
-                   MeasurementRepository measurementRepository) {
+    CoasterService(CoasterRepository coasterRepository, MeasurementRepository measurementRepository) {
         this.coasterRepository = coasterRepository;
         this.measurementRepository = measurementRepository;
     }
 
-    public Mono<Coaster> getCoasterEntity(String deviceName) {
+    public Mono<Coaster> getCoasterEntity(String deviceName, Instant now) {
         return coasterRepository.findById(deviceName)
-                .switchIfEmpty(coasterRepository.create(deviceName, ZoneId.systemDefault()));
+                .switchIfEmpty(coasterRepository.create(deviceName, now, ZoneId.systemDefault()));
     }
 
     public Mono<Tuple2<Coaster, Float>> getCoasterAndDailySumVolume(String deviceName, Instant now) {
-        return getCoasterEntity(deviceName)
+        return getCoasterEntity(deviceName, now)
                 .zipWhen(coaster -> {
                     var date = now.atZone(coaster.getTimezone()).toLocalDate();
                     return measurementRepository.findDailySumVolumeForCoaster(deviceName, date, coaster.getTimezone());
                 });
     }
 
-    public Mono<Coaster> updateCoasterInactivity(String deviceName, Instant inactiveSince) {
-        return getCoasterEntity(deviceName)
+    public Mono<Coaster> updateCoasterInactivity(String deviceName, int inactiveSeconds, Instant now) {
+        var inactiveSince = now.minusSeconds(inactiveSeconds);
+
+        return getCoasterEntity(deviceName, now)
                 .map(coaster -> coaster.setInactiveSince(inactiveSince))
                 .flatMap(coasterRepository::save);
     }
 
-    public Mono<Coaster> updateCoasterInitLoad(String deviceName, float initLoad, Instant currentTime) {
-        return getCoasterEntity(deviceName)
-                .map(coaster -> coaster.setInitLoad(initLoad).setInactiveSince(currentTime))
+    public Mono<Coaster> updateCoasterInitLoad(String deviceName, float initLoad, Instant now) {
+        return getCoasterEntity(deviceName, now)
+                .map(coaster -> coaster.setInitLoad(initLoad).setInactiveSince(now))
                 .flatMap(coasterRepository::save);
     }
 
-    public Mono<Coaster> resetCoasterState(String deviceName) {
-        return getCoasterEntity(deviceName)
+    public Mono<Coaster> resetCoasterState(String deviceName, Instant now) {
+        return getCoasterEntity(deviceName, now)
                 .map(coaster -> coaster.setInitLoad(null))
                 .flatMap(coasterRepository::save);
     }
