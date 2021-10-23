@@ -5,7 +5,7 @@
 #include <PubSubClient.h>
 #include <WiFi.h>
 
-#include "secrets.h"
+#include "constants.h"
 
 #include <atomic>
 #include <chrono>
@@ -19,22 +19,13 @@ HX711 scale;
 WiFiClient wifi_client;
 PubSubClient mqtt_client{wifi_client};
 
-constexpr size_t DEVICE_NAME_LEN = 128;
 char device_name[DEVICE_NAME_LEN] = {0};
-
-constexpr char MQTT_DEVICE_TOPIC_SUFFIX[] = "/device/";
-constexpr size_t DEVICE_TOPIC_LEN = strlen(MQTT_TOPIC) + strlen(MQTT_DEVICE_TOPIC_SUFFIX) + DEVICE_NAME_LEN;
 char device_topic[DEVICE_TOPIC_LEN] = {0};
-
-constexpr size_t JSON_DOC_LEN = 256;
-using JsonDoc = StaticJsonDocument<JSON_DOC_LEN>;
 
 TaskHandle_t buzzer_task;
 steady_clock st_clock;
 time_point<steady_clock> last_activity;
 std::mutex time_mutex;
-
-constexpr hours MAX_INACTIVE_TIME{1};
 
 void buzzerTask(void *) {
     bool buzzer_state = LOW;
@@ -125,8 +116,6 @@ void heartbeatTask(void *) {
     }
 }
 
-constexpr float WATER_DENSITY = 0.9975415;
-
 void IRAM_ATTR button1ISR() { button1 = (digitalRead(27) == LOW); }
 void IRAM_ATTR button2ISR() { button2 = (digitalRead(26) == LOW); }
 void IRAM_ATTR button3ISR() { button3 = (digitalRead(25) == LOW); }
@@ -160,7 +149,7 @@ void setup() {
     // lcd.print(scale.get_units(10));
     // while (digitalRead(27) == HIGH);
 
-    scale.set_scale(-867.8136055);
+    scale.set_scale(LOAD_CELL_SCALE);
     scale.tare();
 
     xTaskCreatePinnedToCore(loadCellTask, "load cell task", 1000, NULL, 1, &load_cell_task, 0);
