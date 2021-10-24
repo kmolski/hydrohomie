@@ -13,21 +13,29 @@
 
 using namespace std::chrono;
 
+// 16x2 character LCD pin bindings:
+// RS = pin 18, EN = pin 5, D4 = pin 17
+// D5 = pin 16, D6 = pin 4, D7 = pin 2
 LiquidCrystal lcd(18, 5, 17, 16, 4, 2);
+// HX711 load sensor bindings:
+// Data = pin 32, Clock = pin 33
 HX711 scale;
 
 WiFiClient wifi_client;
 PubSubClient mqtt_client{wifi_client};
 
+// MQTT client ID for the device, based on the MAC address (eg. 'esp32-a0b0c0d0e0f0')
 char device_name[DEVICE_NAME_LEN] = {0};
+// MQTT device topic, based on the client ID (eg. 'app/device/esp32-a0b0c0d0e0f0')
 char device_topic[DEVICE_TOPIC_LEN] = {0};
 
-TaskHandle_t buzzer_task;
 steady_clock st_clock;
 time_point<steady_clock> last_activity;
-std::mutex time_mutex;
+std::mutex time_mutex; // protects last_activity
 
+TaskHandle_t buzzer_task;
 void buzzerTask(void *) {
+    // Buzzer is on pin 19, LOW is off, HIGH is on
     bool buzzer_state = LOW;
     while (true) {
         time_mutex.lock();
@@ -43,10 +51,10 @@ void buzzerTask(void *) {
     }
 }
 
-TaskHandle_t load_cell_task;
 std::atomic<float> last_load, load, total{0.0}, first_weight{0.0};
 std::atomic<bool> request_tare{false};
 
+TaskHandle_t load_cell_task;
 void loadCellTask(void *) {
     while (true) {
         bool tare_requested = true;
@@ -71,8 +79,6 @@ void loadCellTask(void *) {
 enum class CoasterState { IDLE, MEASURE_FIRST, FIRST_COMPLETE, DISCARD, MEASURE_SECOND, SECOND_COMPLETE, STORE_RESULT };
 
 CoasterState current_state{CoasterState::IDLE};
-std::atomic<bool> button1{false}, button2{false}, button3{false};
-float second_weight = 0.0;
 
 void subscriptionCallback(char topic[], byte *payload, unsigned int length) {
     JsonDoc doc;
@@ -93,7 +99,6 @@ void subscriptionCallback(char topic[], byte *payload, unsigned int length) {
 }
 
 TaskHandle_t heartbeat_task;
-
 void heartbeatTask(void *) {
     byte json_bytes[1024] = {0};
 
@@ -108,8 +113,8 @@ void heartbeatTask(void *) {
             doc["type"] = "heartbeat";
             doc["inactiveSeconds"] = inactive_seconds;
 
-            size_t bytes = serializeJson(doc, json_bytes);
-            mqtt_client.publish(device_topic, json_bytes, bytes);
+            size_t n_bytes = serializeJson(doc, json_bytes);
+            mqtt_client.publish(device_topic, json_bytes, n_bytes);
         }
 
         delay(2 * 60 * 1000);
@@ -117,34 +122,33 @@ void heartbeatTask(void *) {
 }
 
 TaskHandle_t connection_task;
-
 void connectionTask(void *) {
     byte json_bytes[1024] = {0};
 
     while (true) {
         if (!mqtt_client.connected() && mqtt_client.connect(device_name)) {
-            Serial.println("connected to MQTT broker");
             mqtt_client.subscribe(device_topic);
 
             JsonDoc doc;
             doc["device"] = device_name;
             doc["type"] = "connected";
 
-            size_t bytes = serializeJson(doc, json_bytes);
-            mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
+            size_t n_bytes = serializeJson(doc, json_bytes);
+            mqtt_client.publish(MQTT_TOPIC, json_bytes, n_bytes);
         }
 
         delay(5000);
     }
 }
 
+// Button 1 = pin 27, button 2 = pin 26, button 3 = pin 25
+std::atomic<bool> button1{false}, button2{false}, button3{false};
+
 void IRAM_ATTR button1ISR() { button1 = (digitalRead(27) == LOW); }
 void IRAM_ATTR button2ISR() { button2 = (digitalRead(26) == LOW); }
 void IRAM_ATTR button3ISR() { button3 = (digitalRead(25) == LOW); }
 
 void setup() {
-    Serial.begin(115200);
-
     lcd.begin(16, 2);
     scale.begin(32, 33);
 
@@ -155,7 +159,7 @@ void setup() {
     pinMode(27, INPUT);
     attachInterrupt(digitalPinToInterrupt(27), button1ISR, CHANGE);
 
-    // Load cell calibration code
+    // Load cell calibration code (uncomment on first startup)
     // scale.set_scale();
     // scale.tare();
     // lcd.setCursor(0, 0);
@@ -171,6 +175,7 @@ void setup() {
     last_activity = st_clock.now();
     xTaskCreatePinnedToCore(buzzerTask, "buzzer task", 1000, NULL, 1, &buzzer_task, 1);
 
+    // After calculating the load cell scale, adjust it in config.h
     scale.set_scale(LOAD_CELL_SCALE);
     scale.tare();
     xTaskCreatePinnedToCore(loadCellTask, "load cell task", 1000, NULL, 1, &load_cell_task, 1);
@@ -178,16 +183,15 @@ void setup() {
     byte mac[6] = {0};
     WiFi.macAddress(mac);
     snprintf(device_name, DEVICE_NAME_LEN, "esp32-%x%x%x%x%x%x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    Serial.println(device_name);
-
     snprintf(device_topic, DEVICE_TOPIC_LEN, "%s%s%s", MQTT_TOPIC, MQTT_DEVICE_TOPIC_SUFFIX, device_name);
-    Serial.println(device_topic);
 
+    // Adjust WiFi credentials in secrets.h
     WiFi.begin(WIFI_SSID, WIFI_PASS);
     while (WiFi.status() != WL_CONNECTED) {
         delay(100);
     }
 
+    // Adjust MQTT config in secrets.h
     mqtt_client.setServer(MQTT_SERVER_IP, 1883);
     mqtt_client.setCallback(subscriptionCallback);
 
@@ -249,10 +253,9 @@ void loop() {
                 doc["type"] = "begin";
                 doc["load"] = float(first_weight);
 
-                size_t bytes = serializeJson(doc, json_bytes);
-                mqtt_client.publish(device_topic, json_bytes, bytes);
+                size_t n_bytes = serializeJson(doc, json_bytes);
+                mqtt_client.publish(device_topic, json_bytes, n_bytes);
 
-                Serial.println(mqtt_client.state());
                 delay(2000);
                 current_state = CoasterState::FIRST_COMPLETE;
             }
@@ -267,7 +270,7 @@ void loop() {
         }
 
         case CoasterState::FIRST_COMPLETE: {
-            second_weight = load;
+            float second_weight = load;
             float volume = (first_weight - second_weight) / WATER_DENSITY;
 
             snprintf(line_buf, 17, "D:%6.1lfml %02d:%02d", volume, hours, minutes);
@@ -290,10 +293,9 @@ void loop() {
                 doc["type"] = "end";
                 doc["volume"] = volume;
 
-                size_t bytes = serializeJson(doc, json_bytes);
-                mqtt_client.publish(device_topic, json_bytes, bytes);
+                size_t n_bytes = serializeJson(doc, json_bytes);
+                mqtt_client.publish(device_topic, json_bytes, n_bytes);
 
-                Serial.println(mqtt_client.state());
                 delay(2000);
                 current_state = CoasterState::IDLE;
             }
@@ -307,8 +309,8 @@ void loop() {
                 doc["device"] = device_name;
                 doc["type"] = "discard";
 
-                size_t bytes = serializeJson(doc, json_bytes);
-                mqtt_client.publish(device_topic, json_bytes, bytes);
+                size_t n_bytes = serializeJson(doc, json_bytes);
+                mqtt_client.publish(device_topic, json_bytes, n_bytes);
 
                 delay(1000);
                 current_state = CoasterState::IDLE;
