@@ -116,6 +116,28 @@ void heartbeatTask(void *) {
     }
 }
 
+TaskHandle_t connection_task;
+
+void connectionTask(void *) {
+    byte json_bytes[1024] = {0};
+
+    while (true) {
+        if (!mqtt_client.connected() && mqtt_client.connect(device_name)) {
+            Serial.println("connected to MQTT broker");
+            mqtt_client.subscribe(device_topic);
+
+            JsonDoc doc;
+            doc["device"] = device_name;
+            doc["type"] = "connected";
+
+            size_t bytes = serializeJson(doc, json_bytes);
+            mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
+        }
+
+        delay(5000);
+    }
+}
+
 void IRAM_ATTR button1ISR() { button1 = (digitalRead(27) == LOW); }
 void IRAM_ATTR button2ISR() { button2 = (digitalRead(26) == LOW); }
 void IRAM_ATTR button3ISR() { button3 = (digitalRead(25) == LOW); }
@@ -133,11 +155,6 @@ void setup() {
     pinMode(27, INPUT);
     attachInterrupt(digitalPinToInterrupt(27), button1ISR, CHANGE);
 
-    pinMode(19, OUTPUT);
-    digitalWrite(19, LOW);
-    last_activity = st_clock.now();
-    xTaskCreatePinnedToCore(buzzerTask, "buzzer task", 1000, NULL, 1, &buzzer_task, 0);
-
     // Load cell calibration code
     // scale.set_scale();
     // scale.tare();
@@ -149,10 +166,14 @@ void setup() {
     // lcd.print(scale.get_units(10));
     // while (digitalRead(27) == HIGH);
 
+    pinMode(19, OUTPUT);
+    digitalWrite(19, LOW);
+    last_activity = st_clock.now();
+    xTaskCreatePinnedToCore(buzzerTask, "buzzer task", 1000, NULL, 1, &buzzer_task, 1);
+
     scale.set_scale(LOAD_CELL_SCALE);
     scale.tare();
-
-    xTaskCreatePinnedToCore(loadCellTask, "load cell task", 1000, NULL, 1, &load_cell_task, 0);
+    xTaskCreatePinnedToCore(loadCellTask, "load cell task", 1000, NULL, 1, &load_cell_task, 1);
 
     byte mac[6] = {0};
     WiFi.macAddress(mac);
@@ -171,6 +192,7 @@ void setup() {
     mqtt_client.setCallback(subscriptionCallback);
 
     xTaskCreatePinnedToCore(heartbeatTask, "heartbeat task", 4000, NULL, 1, &heartbeat_task, 0);
+    xTaskCreatePinnedToCore(connectionTask, "connection task", 4000, NULL, 1, &connection_task, 0);
 }
 
 char statusToChar(int state) {
@@ -187,23 +209,6 @@ char statusToChar(int state) {
 void loop() {
     byte json_bytes[1024] = {0};
 
-    while (!mqtt_client.connected()) {
-        Serial.println("trying to reconnect");
-        if (mqtt_client.connect(device_name)) {
-            Serial.println("connected to MQTT broker");
-            mqtt_client.subscribe(device_topic);
-
-            JsonDoc doc;
-            doc["device"] = device_name;
-            doc["type"] = "connected";
-
-            size_t bytes = serializeJson(doc, json_bytes);
-            mqtt_client.publish(MQTT_TOPIC, json_bytes, bytes);
-        } else {
-            Serial.println("trying again");
-            delay(5000);
-        }
-    }
     mqtt_client.loop();
 
     char line_buf[17] = {0};
