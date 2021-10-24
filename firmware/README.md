@@ -16,7 +16,7 @@ Built with:
 Setup instructions:
 -----------
 
-# Load cell calibration
+### Load cell calibration
 1. Configure the target device in `platformio.ini`.
 2. Uncomment the load cell calibration code at `src/embedded.cpp:163-171`.
 3. Build & flash the device with `pio run -t upload`.
@@ -26,11 +26,11 @@ Setup instructions:
 7. Set the load cell scale in `include/config.h`.
 8. Comment/remove the load cell calibration code.
 
-# Wi-Fi and MQTT configuration
+### Wi-Fi and MQTT configuration
 9. Set the Wi-Fi SSID, Wi-Fi password, MQTT broker IP and MQTT topic in `include/secrets.h`.
 10. Adjust the maximum inactivity time in `include/config.h`.
 
-# Final setup
+### Final setup
 11. Build & flash the device with `pio run -t upload`.
 
 License:
