@@ -30,7 +30,7 @@ Setup instructions:
 9. Set the Wi-Fi SSID, Wi-Fi password, MQTT broker IP and MQTT topic in `include/secrets.h`.
 10. Adjust the maximum inactivity time in `include/config.h`.
 
-### Final setup
+### Firmware flashing
 11. Build & flash the device with `pio run -t upload`.
 
 License:
