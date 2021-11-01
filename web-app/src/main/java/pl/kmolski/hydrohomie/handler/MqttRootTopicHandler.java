@@ -1,4 +1,4 @@
-package pl.kmolski.hydrohomie.service;
+package pl.kmolski.hydrohomie.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import pl.kmolski.hydrohomie.config.MqttClientSettings;
 import pl.kmolski.hydrohomie.model.CoasterMessage.ConnectedMessage;
 import pl.kmolski.hydrohomie.model.CoasterMessage.ListeningMessage;
+import pl.kmolski.hydrohomie.service.CoasterService;
 
 import java.time.Clock;
 import java.time.Instant;

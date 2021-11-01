@@ -18,8 +18,8 @@ import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessageHeaders;
 import pl.kmolski.hydrohomie.model.CoasterMessage.ConnectedMessage;
 import pl.kmolski.hydrohomie.model.CoasterMessage.DeviceTopicMessage;
-import pl.kmolski.hydrohomie.service.MqttDeviceTopicHandler;
-import pl.kmolski.hydrohomie.service.MqttRootTopicHandler;
+import pl.kmolski.hydrohomie.handler.MqttDeviceTopicHandler;
+import pl.kmolski.hydrohomie.handler.MqttRootTopicHandler;
 
 
 @Configuration
@@ -32,10 +32,10 @@ public class MqttConfiguration {
         var connectionOptions = new MqttConnectOptions();
         connectionOptions.setServerURIs(new String[]{settings.getUrl()});
 
-        var factory = new DefaultMqttPahoClientFactory();
-        factory.setConnectionOptions(connectionOptions);
+        var clientFactory = new DefaultMqttPahoClientFactory();
+        clientFactory.setConnectionOptions(connectionOptions);
 
-        return factory;
+        return clientFactory;
     }
 
     @Bean

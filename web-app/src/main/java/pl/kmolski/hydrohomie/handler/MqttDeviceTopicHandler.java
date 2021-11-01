@@ -1,4 +1,4 @@
-package pl.kmolski.hydrohomie.service;
+package pl.kmolski.hydrohomie.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import pl.kmolski.hydrohomie.model.CoasterMessage.*;
 import pl.kmolski.hydrohomie.model.Measurement;
 import pl.kmolski.hydrohomie.repo.MeasurementRepository;
+import pl.kmolski.hydrohomie.service.CoasterService;
 
 import java.time.Clock;
 import java.time.Instant;
