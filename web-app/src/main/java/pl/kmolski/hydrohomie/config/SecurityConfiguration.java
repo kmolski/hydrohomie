@@ -27,6 +27,7 @@ public class SecurityConfiguration {
         logoutSuccessHandler.setLogoutSuccessUrl(URI.create("/login?logout"));
 
         return http.authorizeExchange()
+                .pathMatchers("/actuator/health").permitAll()
                 .pathMatchers("/login", "/webjars/**").permitAll()
                 .pathMatchers("/**").authenticated()
                     .and()
