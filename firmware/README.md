@@ -2,8 +2,8 @@
 
 Firmware for the smart coaster device, based on the Arduino ESP32 platform and open-source libraries.
 
-Built with:
------------
+Dependencies
+------------
 
 - PlatformIO toolset
 - Arduino ESP32 platform
@@ -13,7 +13,7 @@ Built with:
 - [bblanchon/ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 - [bogde/HX711](https://github.com/bogde/HX711)
 
-Setup instructions:
+Setup instructions
 -----------
 
 ### Load cell calibration
@@ -33,7 +33,7 @@ Setup instructions:
 ### Firmware flashing
 11. Build & flash the device with `pio run -t upload`.
 
-License:
---------
+License
+-------
 
 [MIT License](https://opensource.org/licenses/MIT)
