@@ -3,6 +3,10 @@ package pl.kmolski.hydrohomie.model;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import pl.kmolski.hydrohomie.service.CoasterService;
+import reactor.core.publisher.Mono;
+
+import java.time.Instant;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 import static pl.kmolski.hydrohomie.model.CoasterMessage.*;
@@ -19,14 +23,38 @@ import static pl.kmolski.hydrohomie.model.CoasterMessage.*;
 public sealed interface CoasterMessage {
 
     record ConnectedMessage(String device) implements CoasterMessage {}
+    record ListeningMessage(String device, Float initLoad, float initTotal) implements CoasterMessage {}
 
-    sealed interface DeviceTopicMessage extends CoasterMessage {}
-    record HeartbeatMessage(String device, int inactiveSeconds) implements DeviceTopicMessage {}
-    record ListeningMessage(String device, Float initLoad, float initTotal) implements DeviceTopicMessage {}
+    sealed interface IncomingDeviceTopicMessage extends CoasterMessage {
+        Mono<Coaster> handle(CoasterService coasterService, Instant now);
+    }
 
-    record BeginMessage(String device, float load) implements DeviceTopicMessage {}
-    record EndMessage(String device, float volume) implements DeviceTopicMessage {}
-    record DiscardMessage(String device) implements DeviceTopicMessage {}
+    record HeartbeatMessage(String device, int inactiveSeconds) implements IncomingDeviceTopicMessage {
+        @Override
+        public Mono<Coaster> handle(CoasterService coasterService, Instant now) {
+            return coasterService.updateCoasterInactivity(device, inactiveSeconds, now);
+        }
+    }
 
-    String device();
+    record BeginMessage(String device, float load) implements IncomingDeviceTopicMessage {
+        @Override
+        public Mono<Coaster> handle(CoasterService coasterService, Instant now) {
+            return coasterService.updateCoasterInitLoad(device, load, now);
+        }
+    }
+
+    record EndMessage(String device, float volume) implements IncomingDeviceTopicMessage {
+        @Override
+        public Mono<Coaster> handle(CoasterService coasterService, Instant now) {
+            var measurement = new Measurement(null, device, volume, now);
+            return coasterService.createMeasurement(device, measurement, now);
+        }
+    }
+
+    record DiscardMessage(String device) implements IncomingDeviceTopicMessage {
+        @Override
+        public Mono<Coaster> handle(CoasterService coasterService, Instant now) {
+            return coasterService.resetCoasterState(device, now);
+        }
+    }
 }

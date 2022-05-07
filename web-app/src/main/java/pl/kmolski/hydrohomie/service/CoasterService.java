@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pl.kmolski.hydrohomie.model.Coaster;
+import pl.kmolski.hydrohomie.model.Measurement;
 import pl.kmolski.hydrohomie.repo.CoasterRepository;
 import pl.kmolski.hydrohomie.repo.MeasurementRepository;
 import reactor.core.publisher.Mono;
@@ -35,8 +36,8 @@ public class CoasterService {
     public Mono<Tuple2<Coaster, Float>> getCoasterAndDailySumVolume(String deviceName, Instant now) {
         return getCoasterEntity(deviceName, now)
                 .zipWhen(coaster -> {
-                    var date = now.atZone(coaster.getTimezone()).toLocalDate();
-                    return measurementRepository.findDailySumVolumeForCoaster(deviceName, date, coaster.getTimezone());
+                    var today = now.atZone(coaster.getTimezone()).toLocalDate();
+                    return measurementRepository.findDailySumVolumeForCoaster(deviceName, today, coaster.getTimezone());
                 });
     }
 
@@ -52,6 +53,11 @@ public class CoasterService {
         return getCoasterEntity(deviceName, now)
                 .map(coaster -> coaster.setInitLoad(initLoad).setInactiveSince(now))
                 .flatMap(coasterRepository::save);
+    }
+
+    public Mono<Coaster> createMeasurement(String deviceName, Measurement measurement, Instant now) {
+        return resetCoasterState(deviceName, now)
+                .flatMap(coaster -> measurementRepository.save(measurement).thenReturn(coaster));
     }
 
     public Mono<Coaster> resetCoasterState(String deviceName, Instant now) {

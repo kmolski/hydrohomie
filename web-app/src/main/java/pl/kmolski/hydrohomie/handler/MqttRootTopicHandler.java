@@ -37,16 +37,14 @@ public class MqttRootTopicHandler implements GenericHandler<ConnectedMessage> {
     public Message<ListeningMessage> handle(ConnectedMessage message, MessageHeaders headers) {
         LOGGER.info("Received on root topic '{}': {}", headers.get(MqttHeaders.RECEIVED_TOPIC), message);
 
-        var deviceName = message.device();
-        var now = Instant.now(clock);
-        return coasterService.getCoasterAndDailySumVolume(deviceName, now)
+        return coasterService.getCoasterAndDailySumVolume(message.device(), Instant.now(clock))
                 .map(coasterAndTotal -> {
                     var coaster = coasterAndTotal.getT1();
-                    var initTotal = coasterAndTotal.getT2();
+                    float initTotal = coasterAndTotal.getT2();
                     return new ListeningMessage(coaster.getDeviceName(), coaster.getInitLoad(), initTotal);
                 })
                 .map(response -> {
-                    var responseTopic = mqttClientSettings.getTopic() + DEVICE_TOPIC_SUFFIX + deviceName;
+                    var responseTopic = mqttClientSettings.getTopic() + DEVICE_TOPIC_SUFFIX + response.device();
                     LOGGER.info("Sending to device topic '{}': {}", responseTopic, response);
 
                     return MessageBuilder.withPayload(response)
