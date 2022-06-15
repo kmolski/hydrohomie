@@ -10,8 +10,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
 
-import java.net.URI;
-
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfiguration {
@@ -23,9 +21,6 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        var logoutSuccessHandler = new RedirectServerLogoutSuccessHandler();
-        logoutSuccessHandler.setLogoutSuccessUrl(URI.create("/login?logout"));
-
         return http.authorizeExchange()
                 .pathMatchers("/actuator/health").permitAll()
                 .pathMatchers("/login", "/webjars/**").permitAll()
@@ -37,9 +32,8 @@ public class SecurityConfiguration {
                     .and()
                 .logout()
                     .logoutUrl("/logout")
-                    .logoutSuccessHandler(logoutSuccessHandler)
+                    .logoutSuccessHandler(new RedirectServerLogoutSuccessHandler())
                     .and()
-                .csrf().disable()
                 .build();
     }
 }

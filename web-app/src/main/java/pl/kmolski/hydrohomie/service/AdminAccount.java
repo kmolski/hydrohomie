@@ -15,13 +15,13 @@ public class AdminAccount implements Account {
 
     private static final String ADMIN_ROLE = "ADMIN";
 
+    private final String username;
+    private final String passwordHash;
+
     AdminAccount(AdminAccountSettings adminAccountSettings, PasswordEncoder passwordEncoder) {
         this.username = adminAccountSettings.getUsername();
         this.passwordHash = passwordEncoder.encode(adminAccountSettings.getPassword());
     }
-
-    private final String username;
-    private final String passwordHash;
 
     @Override
     public String getUsername() {
