@@ -1,4 +1,4 @@
-package pl.kmolski.hydrohomie.handler;
+package pl.kmolski.hydrohomie.mqtt.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,26 +8,26 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
-import pl.kmolski.hydrohomie.config.MqttClientSettings;
-import pl.kmolski.hydrohomie.model.CoasterMessage.ConnectedMessage;
-import pl.kmolski.hydrohomie.model.CoasterMessage.ListeningMessage;
+import pl.kmolski.hydrohomie.mqtt.config.MqttClientSettings;
+import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.ConnectedMessage;
+import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.ListeningMessage;
 import pl.kmolski.hydrohomie.service.CoasterService;
 
 import java.time.Clock;
 import java.time.Instant;
 
-import static pl.kmolski.hydrohomie.config.MqttConfiguration.DEVICE_TOPIC_SUFFIX;
+import static pl.kmolski.hydrohomie.mqtt.config.MqttConfiguration.DEVICE_TOPIC_SUFFIX;
 
 @Component
-public class MqttRootTopicHandler implements GenericHandler<ConnectedMessage> {
+public class RootTopicHandler implements GenericHandler<ConnectedMessage> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MqttRootTopicHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RootTopicHandler.class);
 
     private final CoasterService coasterService;
     private final MqttClientSettings mqttClientSettings;
     private final Clock clock;
 
-    MqttRootTopicHandler(CoasterService coasterService, MqttClientSettings mqttClientSettings, Clock clock) {
+    RootTopicHandler(CoasterService coasterService, MqttClientSettings mqttClientSettings, Clock clock) {
         this.coasterService = coasterService;
         this.mqttClientSettings = mqttClientSettings;
         this.clock = clock;

@@ -1,15 +1,17 @@
-package pl.kmolski.hydrohomie.model;
+package pl.kmolski.hydrohomie.mqtt.model;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import pl.kmolski.hydrohomie.model.Coaster;
+import pl.kmolski.hydrohomie.model.Measurement;
 import pl.kmolski.hydrohomie.service.CoasterService;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
-import static pl.kmolski.hydrohomie.model.CoasterMessage.*;
+import static pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.*;
 
 @JsonTypeInfo(use = NAME, property = "type")
 @JsonSubTypes({

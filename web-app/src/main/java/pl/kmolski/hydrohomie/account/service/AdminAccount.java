@@ -1,11 +1,11 @@
-package pl.kmolski.hydrohomie.service;
+package pl.kmolski.hydrohomie.account.service;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import pl.kmolski.hydrohomie.config.AdminAccountSettings;
-import pl.kmolski.hydrohomie.model.Account;
+import pl.kmolski.hydrohomie.account.config.AdminAccountSettings;
+import pl.kmolski.hydrohomie.account.model.Account;
 
 import java.util.Collection;
 import java.util.Set;

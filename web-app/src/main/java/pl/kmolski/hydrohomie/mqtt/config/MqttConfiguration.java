@@ -1,4 +1,4 @@
-package pl.kmolski.hydrohomie.config;
+package pl.kmolski.hydrohomie.mqtt.config;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.context.annotation.Bean;
@@ -13,11 +13,11 @@ import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessageHeaders;
-import pl.kmolski.hydrohomie.handler.MqttDeviceTopicHandler;
-import pl.kmolski.hydrohomie.handler.MqttRootTopicHandler;
-import pl.kmolski.hydrohomie.model.CoasterMessage;
-import pl.kmolski.hydrohomie.model.CoasterMessage.ConnectedMessage;
-import pl.kmolski.hydrohomie.model.CoasterMessage.IncomingDeviceTopicMessage;
+import pl.kmolski.hydrohomie.mqtt.handler.DeviceTopicHandler;
+import pl.kmolski.hydrohomie.mqtt.handler.RootTopicHandler;
+import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage;
+import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.ConnectedMessage;
+import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.IncomingDeviceTopicMessage;
 
 
 @Configuration
@@ -61,7 +61,7 @@ public class MqttConfiguration {
     }
 
     @Bean
-    public IntegrationFlow mqttRootTopicFlow(MqttRootTopicHandler rootTopicHandler, MessageHandler mqttOutbound) {
+    public IntegrationFlow mqttRootTopicFlow(RootTopicHandler rootTopicHandler, MessageHandler mqttOutbound) {
         return IntegrationFlows.from("root")
                 .handle(ConnectedMessage.class, rootTopicHandler)
                 .transform(Transformers.toJson())
@@ -70,7 +70,7 @@ public class MqttConfiguration {
     }
 
     @Bean
-    public IntegrationFlow mqttDeviceTopicFlow(MqttDeviceTopicHandler deviceTopicHandler) {
+    public IntegrationFlow mqttDeviceTopicFlow(DeviceTopicHandler deviceTopicHandler) {
         return IntegrationFlows.from("device-in")
                 .filter(CoasterMessage.class, msg -> msg instanceof IncomingDeviceTopicMessage)
                 .handle(IncomingDeviceTopicMessage.class, deviceTopicHandler)

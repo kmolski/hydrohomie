@@ -18,6 +18,7 @@
         <h1>Login with your account</h1> <br/>
         <form name="f" th:action="@{/login}" method="post">
             <fieldset>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div th:if="${param.error}" class="alert alert-warning">
                     Invalid username and password.
                 </div>

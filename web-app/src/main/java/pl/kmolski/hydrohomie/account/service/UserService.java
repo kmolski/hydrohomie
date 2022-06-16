@@ -1,11 +1,11 @@
-package pl.kmolski.hydrohomie.service;
+package pl.kmolski.hydrohomie.account.service;
 
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import pl.kmolski.hydrohomie.model.Account;
-import pl.kmolski.hydrohomie.model.UserPrincipal;
-import pl.kmolski.hydrohomie.repo.UserRepository;
+import pl.kmolski.hydrohomie.account.model.Account;
+import pl.kmolski.hydrohomie.account.model.UserPrincipal;
+import pl.kmolski.hydrohomie.account.repo.UserRepository;
 import reactor.core.publisher.Mono;
 
 @Component
