@@ -5,10 +5,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+/**
+ * <p>Implementation of {@link UserDetails} based on the common {@link Account} interface.</p>
+ * <p>Account expiration, account locking and credential expiration are not implemented.</p>
+ */
 public class UserPrincipal implements UserDetails {
 
     private final Account account;
 
+    /**
+     * Construct user information based on the {@link Account} object
+     * @param account the account object
+     */
     public UserPrincipal(Account account) {
         this.account = account;
     }

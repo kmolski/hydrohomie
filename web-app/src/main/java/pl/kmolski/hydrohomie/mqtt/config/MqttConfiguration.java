@@ -20,11 +20,22 @@ import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.ConnectedMessage;
 import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.IncomingDeviceTopicMessage;
 
 
+/**
+ * Bean configuration for inbound and outbound MQTT clients.
+ */
 @Configuration
 public class MqttConfiguration {
 
-    public static final String DEVICE_TOPIC_SUFFIX = "/device/";
+    /**
+     * MQTT subtopic for individual devices
+     */
+    public static final String DEVICE_SUBTOPIC = "/device/";
 
+    /**
+     * Configure the {@link MqttPahoClientFactory} instance.
+     * @param settings the MQTT client connection settings
+     * @return the client factory
+     */
     @Bean
     public MqttPahoClientFactory mqttPahoClientFactory(MqttClientSettings settings) {
         var connectionOptions = new MqttConnectOptions();
@@ -36,16 +47,30 @@ public class MqttConfiguration {
         return clientFactory;
     }
 
+    /**
+     * Configure the {@link MqttPahoMessageDrivenChannelAdapter} to handle inbound MQTT messages
+     * from the root topic and device subtopics. The client ID ends with a '-rx' suffix.
+     * @param settings the MQTT client connection settings
+     * @param clientFactory the client factory
+     * @return the channel adapter for inbound messages
+     */
     @Bean
     public MqttPahoMessageDrivenChannelAdapter mqttChannelAdapter(MqttClientSettings settings,
                                                                   MqttPahoClientFactory clientFactory) {
         String rootTopic = settings.getTopic();
-        var deviceTopic = rootTopic + DEVICE_TOPIC_SUFFIX + "+";
+        var deviceTopic = rootTopic + DEVICE_SUBTOPIC + "+";
         var clientId = settings.getClientId() + "-rx";
 
         return new MqttPahoMessageDrivenChannelAdapter(clientId, clientFactory, rootTopic, deviceTopic);
     }
 
+    /**
+     * Configure the {@link IntegrationFlow} for inbound MQTT messages. The root topic messages are
+     * routed to the 'root' channel, while the device subtopic messages are routed to 'device-in'.
+     * The incoming messages are assumed to have valid JSON payloads.
+     * @param adapter the channel adapter for inbound messages
+     * @return the integration flow for inbound messages
+     */
     @Bean
     public IntegrationFlow mqttInbound(MqttPahoMessageDrivenChannelAdapter adapter) {
         return IntegrationFlows.from(adapter)
@@ -54,12 +79,24 @@ public class MqttConfiguration {
                 .get();
     }
 
+    /**
+     * Configure the {@link MqttPahoMessageHandler} for sending MQTT messages. The client ID ends with a '-tx' suffix.
+     * @param settings the MQTT client connection settings
+     * @param mqttPahoClientFactory the client factory
+     * @return the outbound message handler
+     */
     @Bean
     public MessageHandler mqttOutbound(MqttClientSettings settings, MqttPahoClientFactory mqttPahoClientFactory) {
         String clientId = settings.getClientId() + "-tx";
         return new MqttPahoMessageHandler(clientId, mqttPahoClientFactory);
     }
 
+    /**
+     * Configure the integration flow for incoming root topic messages. Outbound messages are converted to JSON.
+     * @param rootTopicHandler the root topic message handler
+     * @param mqttOutbound the outbound message handler
+     * @return the root topic integration flow
+     */
     @Bean
     public IntegrationFlow mqttRootTopicFlow(RootTopicHandler rootTopicHandler, MessageHandler mqttOutbound) {
         return IntegrationFlows.from("root")
@@ -69,6 +106,11 @@ public class MqttConfiguration {
                 .get();
     }
 
+    /**
+     * Configure the integration flow for incoming device subtopic messages.
+     * @param deviceTopicHandler the device topic message handler
+     * @return the device topic integration flow
+     */
     @Bean
     public IntegrationFlow mqttDeviceTopicFlow(DeviceTopicHandler deviceTopicHandler) {
         return IntegrationFlows.from("device-in")
