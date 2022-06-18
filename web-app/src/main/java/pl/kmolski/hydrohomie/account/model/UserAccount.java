@@ -11,7 +11,7 @@ import java.util.Set;
 @Table("user_data")
 public class UserAccount implements Account {
 
-    private static final String USER_ROLE = "USER";
+    public static final String USER_ROLE = "ROLE_USER";
 
     @Id
     private final String username;

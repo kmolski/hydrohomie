@@ -13,7 +13,7 @@ import java.util.Set;
 @Component
 public class AdminAccount implements Account {
 
-    private static final String ADMIN_ROLE = "ADMIN";
+    public static final String ADMIN_ROLE = "ROLE_ADMIN";
 
     private final String username;
     private final String passwordHash;

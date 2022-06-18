@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>hydrohomie - Users</title>
+</head>
+<body>
+    <nav th:replace="bare_navbar::navbar(navs=~{::#divContent})">
+        <div id="divContent" th:remove="tag">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="navbar-nav me-auto">
+                    <hr class="bg-light"/>
+                    <a class="nav-link active" aria-current="page" href="#">Users</a>
+                </div>
+                <div class="navbar-nav">
+                    <hr class="bg-light"/>
+                    <form class="align-content-end" name="logout" th:action="@{/logout}" method="post">
+                        <input class="btn btn-link nav-link" type="submit" value="Sign out" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <div class="row">
+            <div class="col-sm">
+                <h3>User accounts</h3> <br/>
+                <div th:each="user, it : ${userAccounts}">
+                    <div th:text="${user.username}"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
