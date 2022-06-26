@@ -1,4 +1,4 @@
-package pl.kmolski.hydrohomie.model;
+package pl.kmolski.hydrohomie.coaster.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -18,6 +18,7 @@ public class Coaster {
     private String description;
     private ZoneId timezone;
     private String place;
+    private String owner;
 
     private Float initLoad;
     private Instant inactiveSince;
@@ -66,6 +67,15 @@ public class Coaster {
         return this;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
+    public Coaster setOwner(String owner) {
+        this.owner = owner;
+        return this;
+    }
+
     public Float getInitLoad() {
         return initLoad;
     }
@@ -86,8 +96,8 @@ public class Coaster {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         Coaster coaster = (Coaster) o;
         return deviceName.equals(coaster.deviceName);
     }
@@ -105,6 +115,7 @@ public class Coaster {
                 .add("description='" + description + "'")
                 .add("timezone=" + timezone)
                 .add("place='" + place + "'")
+                .add("owner='" + owner + "'")
                 .add("initLoad=" + initLoad)
                 .add("inactiveSince=" + inactiveSince)
                 .toString();

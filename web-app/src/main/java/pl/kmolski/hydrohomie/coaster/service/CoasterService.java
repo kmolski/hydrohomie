@@ -1,13 +1,13 @@
-package pl.kmolski.hydrohomie.service;
+package pl.kmolski.hydrohomie.coaster.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import pl.kmolski.hydrohomie.model.Coaster;
-import pl.kmolski.hydrohomie.model.Measurement;
-import pl.kmolski.hydrohomie.repo.CoasterRepository;
-import pl.kmolski.hydrohomie.repo.MeasurementRepository;
+import pl.kmolski.hydrohomie.coaster.model.Coaster;
+import pl.kmolski.hydrohomie.coaster.model.Measurement;
+import pl.kmolski.hydrohomie.coaster.repo.CoasterRepository;
+import pl.kmolski.hydrohomie.coaster.repo.MeasurementRepository;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 

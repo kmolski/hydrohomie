@@ -1,10 +1,10 @@
-package pl.kmolski.hydrohomie.repo;
+package pl.kmolski.hydrohomie.coaster.repo;
 
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
-import pl.kmolski.hydrohomie.model.Coaster;
+import pl.kmolski.hydrohomie.coaster.model.Coaster;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;

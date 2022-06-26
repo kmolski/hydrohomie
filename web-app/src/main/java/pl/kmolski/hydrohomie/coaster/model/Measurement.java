@@ -1,4 +1,4 @@
-package pl.kmolski.hydrohomie.model;
+package pl.kmolski.hydrohomie.coaster.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
