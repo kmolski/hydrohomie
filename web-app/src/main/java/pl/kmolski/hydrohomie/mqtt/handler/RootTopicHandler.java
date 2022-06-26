@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import pl.kmolski.hydrohomie.mqtt.config.MqttClientSettings;
 import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.ConnectedMessage;
 import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.ListeningMessage;
-import pl.kmolski.hydrohomie.service.CoasterService;
+import pl.kmolski.hydrohomie.coaster.service.CoasterService;
 
 import java.time.Clock;
 import java.time.Instant;

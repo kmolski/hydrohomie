@@ -3,9 +3,9 @@ package pl.kmolski.hydrohomie.mqtt.model;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import pl.kmolski.hydrohomie.model.Coaster;
-import pl.kmolski.hydrohomie.model.Measurement;
-import pl.kmolski.hydrohomie.service.CoasterService;
+import pl.kmolski.hydrohomie.coaster.model.Coaster;
+import pl.kmolski.hydrohomie.coaster.model.Measurement;
+import pl.kmolski.hydrohomie.coaster.service.CoasterService;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;

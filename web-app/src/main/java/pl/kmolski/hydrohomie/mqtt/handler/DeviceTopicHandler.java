@@ -7,7 +7,7 @@ import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
 import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.*;
-import pl.kmolski.hydrohomie.service.CoasterService;
+import pl.kmolski.hydrohomie.coaster.service.CoasterService;
 
 import java.time.Clock;
 import java.time.Instant;
