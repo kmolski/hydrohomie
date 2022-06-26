@@ -7,9 +7,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import pl.kmolski.hydrohomie.account.model.Account;
 import pl.kmolski.hydrohomie.account.model.UserAccount;
-import pl.kmolski.hydrohomie.account.model.UserPrincipal;
 import pl.kmolski.hydrohomie.account.repo.UserRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,17 +26,13 @@ public class UserService implements ReactiveUserDetailsService {
         this.adminAccount = adminAccount;
     }
 
-    private Mono<? extends Account> getUserEntity(String username) {
+    @Override
+    public Mono<UserDetails> findByUsername(String username) {
         if (adminAccount.getUsername().equals(username)) {
             return Mono.just(adminAccount);
         } else {
-            return userRepository.findById(username);
+            return userRepository.findByUsername(username);
         }
-    }
-
-    @Override
-    public Mono<UserDetails> findByUsername(String username) {
-        return getUserEntity(username).map(UserPrincipal::new);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

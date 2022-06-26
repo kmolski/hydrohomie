@@ -28,7 +28,7 @@ public class UserAccount implements Account {
     }
 
     @Override
-    public String getPasswordHash() {
+    public String getPassword() {
         return passwordHash;
     }
 

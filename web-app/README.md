@@ -1,11 +1,11 @@
 # hydrohomie - web application
 
-Companion web app for the smart coaster device, based on Spring Boot and open-source tools.
+Companion web app for the smart coaster device, built with Java 17 and open-source tools.
 
-Built with
-----------
+Dependencies
+------------
 
-- Java 17
+- Spring Boot
 - Spring WebFlux
 - Spring Data R2DBC + PostgreSQL
 

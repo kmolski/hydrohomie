@@ -29,7 +29,7 @@ public class AdminAccount implements Account {
     }
 
     @Override
-    public String getPasswordHash() {
+    public String getPassword() {
         return passwordHash;
     }
 
