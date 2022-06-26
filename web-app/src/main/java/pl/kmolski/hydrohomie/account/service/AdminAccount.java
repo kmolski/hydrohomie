@@ -19,8 +19,8 @@ public class AdminAccount implements Account {
     private final String passwordHash;
 
     AdminAccount(AdminAccountSettings adminAccountSettings, PasswordEncoder passwordEncoder) {
-        this.username = adminAccountSettings.getUsername();
-        this.passwordHash = passwordEncoder.encode(adminAccountSettings.getPassword());
+        this.username = adminAccountSettings.username();
+        this.passwordHash = passwordEncoder.encode(adminAccountSettings.password());
     }
 
     @Override

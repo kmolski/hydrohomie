@@ -39,7 +39,7 @@ public class MqttConfiguration {
     @Bean
     public MqttPahoClientFactory mqttPahoClientFactory(MqttClientSettings settings) {
         var connectionOptions = new MqttConnectOptions();
-        connectionOptions.setServerURIs(new String[]{settings.getUrl()});
+        connectionOptions.setServerURIs(new String[]{settings.url()});
 
         var clientFactory = new DefaultMqttPahoClientFactory();
         clientFactory.setConnectionOptions(connectionOptions);
@@ -57,17 +57,19 @@ public class MqttConfiguration {
     @Bean
     public MqttPahoMessageDrivenChannelAdapter mqttChannelAdapter(MqttClientSettings settings,
                                                                   MqttPahoClientFactory clientFactory) {
-        String rootTopic = settings.getTopic();
+        String rootTopic = settings.topic();
         var deviceTopic = rootTopic + DEVICE_SUBTOPIC + "+";
-        var clientId = settings.getClientId() + "-rx";
+        var clientId = settings.clientId() + "-rx";
 
         return new MqttPahoMessageDrivenChannelAdapter(clientId, clientFactory, rootTopic, deviceTopic);
     }
 
     /**
-     * Configure the {@link IntegrationFlow} for inbound MQTT messages. The root topic messages are
-     * routed to the 'root' channel, while the device subtopic messages are routed to 'device-in'.
-     * The incoming messages are assumed to have valid JSON payloads.
+     * <p>Configure the {@link IntegrationFlow} for inbound MQTT messages.</p>
+     * <p>
+     *     The root topic messages are routed to the 'root' channel, while the device subtopic messages
+     *     are routed to 'device-in'. The incoming messages are assumed to have valid JSON payloads.
+     * </p>
      * @param adapter the channel adapter for inbound messages
      * @return the integration flow for inbound messages
      */
@@ -87,7 +89,7 @@ public class MqttConfiguration {
      */
     @Bean
     public MessageHandler mqttOutbound(MqttClientSettings settings, MqttPahoClientFactory mqttPahoClientFactory) {
-        String clientId = settings.getClientId() + "-tx";
+        String clientId = settings.clientId() + "-tx";
         return new MqttPahoMessageHandler(clientId, mqttPahoClientFactory);
     }
 

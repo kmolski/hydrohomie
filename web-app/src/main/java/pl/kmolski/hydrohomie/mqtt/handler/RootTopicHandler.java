@@ -16,7 +16,7 @@ import pl.kmolski.hydrohomie.service.CoasterService;
 import java.time.Clock;
 import java.time.Instant;
 
-import static pl.kmolski.hydrohomie.mqtt.config.MqttConfiguration.DEVICE_TOPIC_SUFFIX;
+import static pl.kmolski.hydrohomie.mqtt.config.MqttConfiguration.DEVICE_SUBTOPIC;
 
 @Component
 public class RootTopicHandler implements GenericHandler<ConnectedMessage> {
@@ -44,7 +44,7 @@ public class RootTopicHandler implements GenericHandler<ConnectedMessage> {
                     return new ListeningMessage(coaster.getDeviceName(), coaster.getInitLoad(), initTotal);
                 })
                 .map(response -> {
-                    var responseTopic = mqttClientSettings.getTopic() + DEVICE_TOPIC_SUFFIX + response.device();
+                    var responseTopic = mqttClientSettings.topic() + DEVICE_SUBTOPIC + response.device();
                     LOGGER.info("Sending to device topic '{}': {}", responseTopic, response);
 
                     return MessageBuilder.withPayload(response)
