@@ -7,11 +7,11 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
-    <title>hydrohomie - Users</title>
+    <title>Users - hydrohomie</title>
 </head>
 <body>
     <nav th:replace="bare_navbar::navbar(navs=~{::#divContent})">
-        <div id="divContent" th:remove="tag">
+        <div th:remove="tag" id="divContent">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -32,14 +32,56 @@
     </nav>
 
     <div class="container my-4">
-        <div class="row">
-            <div class="col-sm">
-                <h3>User accounts</h3> <br/>
-                <div th:each="user, it : ${userAccounts}">
-                    <div th:text="${user.username}"/>
-                </div>
-            </div>
+        <div th:switch="${userAccounts.isEmpty}" class="d-flex flex-row mb-4 justify-content-between">
+            <h3 th:case="false">Managing <span th:text="${userAccounts.getTotalElements()}" th:remove="tag"></span> users</h3>
+            <h3 th:case="true">You don't have any users yet.</h3>
+            <a href="/admin/createUser" class="btn btn-primary">Create new user</a>
         </div>
+        <table th:if="${not userAccounts.isEmpty}" class="table table-striped table-bordered">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th scope="col">Enabled</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="user, it : ${userAccounts.content}">
+                <th th:text="${it.count}" scope="row"></th>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.enabled}"></td>
+                <td class="d-flex flex-row flex-wrap justify-content-end">
+                    <form th:action="@{/deleteUser/${user.id}}" method="post">
+                        <input class="btn btn-danger" type="submit" value="Delete"/>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <nav>
+            <ul class="pagination justify-content-end">
+                <li th:class="${'page-item ' + (userAccounts.hasPrevious() ? '' : 'disabled')}">
+                    <div th:switch="${userAccounts.hasPrevious()}" th:remove="tag">
+                        <a class="page-link" th:case="true" th:href="${'?page=' + userAccounts.previousPageable().pageNumber}">Previous</a>
+                        <a class="page-link" th:case="false" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </div>
+                </li>
+                <li th:class="${'page-item ' + (it.index == userAccounts.number ? 'active' : '')}"
+                    th:each="pageNumber, it : ${#numbers.sequence(1, userAccounts.totalPages)}"
+                    th:switch="${it.index != userAccounts.number}">
+                    <a class="page-link" th:case="true" th:href="${'?page=' + it.index}" th:text="${pageNumber}"></a>
+                    <a class="page-link" th:case="false" href="#" aria-current="page" th:text="${pageNumber}"></a>
+                </li>
+                <li th:class="${'page-item ' + (userAccounts.hasNext() ? '' : 'disabled')}">
+                    <div th:switch="${userAccounts.hasNext()}" th:remove="tag">
+                        <a class="page-link" th:case="true" th:href="${'?page=' + userAccounts.nextPageable().getPageNumber()}">Next</a>
+                        <a class="page-link" th:case="false" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
     </div>
 </body>
 </html>

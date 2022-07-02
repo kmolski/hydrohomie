@@ -2,7 +2,7 @@ package pl.kmolski.hydrohomie.coaster.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.kmolski.hydrohomie.coaster.model.Coaster;
 import pl.kmolski.hydrohomie.coaster.model.Measurement;
@@ -14,7 +14,7 @@ import reactor.util.function.Tuple2;
 import java.time.Instant;
 import java.time.ZoneId;
 
-@Component
+@Service
 @Transactional
 public class CoasterService {
 

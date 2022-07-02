@@ -2,17 +2,19 @@ package pl.kmolski.hydrohomie.account.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.kmolski.hydrohomie.account.model.UserAccount;
 import pl.kmolski.hydrohomie.account.repo.UserRepository;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Component
+@Service
 @Transactional
 public class UserService implements ReactiveUserDetailsService {
 
@@ -36,7 +38,9 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Flux<UserAccount> getAllUserAccounts() {
-        return userRepository.findAll();
+    public Mono<Page<UserAccount>> getAllUserAccounts(Pageable pageable) {
+        return userRepository.findAllBy(pageable).collectList()
+                .zipWith(userRepository.count())
+                .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
     }
 }
