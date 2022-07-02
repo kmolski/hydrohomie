@@ -7,14 +7,14 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
-    <title>hydrohomie - Sign in</title>
+    <title>Sign in - hydrohomie</title>
 </head>
 <body>
     <nav th:replace="bare_navbar::navbar"></nav>
 
     <div class="container my-4 col-sm-6 col-sm-offset-3 login">
         <h1>Sign in with your account</h1> <br/>
-        <form name="login" th:action="@{/login}" method="post">
+        <form th:action="@{/login}" name="login" method="post">
             <fieldset>
                 <div th:if="${param.error}" class="alert alert-warning">
                     Invalid username or password.
