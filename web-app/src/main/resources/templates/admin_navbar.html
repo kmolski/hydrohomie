@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>hydrohomie</title>
+</head>
+<body>
+    <nav th:fragment="navbar(current)" th:replace="bare_navbar::navbar(navs=~{::#divContent})">
+        <div th:remove="tag" id="divContent">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="navbar-nav me-auto">
+                    <hr class="bg-light"/>
+                    <a th:class="${'nav-link ' + (current == 'users' ? 'active' : '')}"
+                       th:href="${current == 'users' ? '#' : '/admin'}">Users</a>
+                </div>
+                <div class="navbar-nav">
+                    <hr class="bg-light"/>
+                    <form th:action="@{/logout}" class="align-content-end" name="logout" method="post">
+                        <input class="btn btn-link nav-link" type="submit" value="Sign out"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>Success - hydrohomie</title>
+</head>
+<body>
+    <nav th:replace="admin_navbar::navbar('success')"></nav>
+
+    <div class="container my-4">
+        <h3 class="mb-3" th:text="${message}"></h3>
+        <a th:href="${redirect}" class="btn btn-primary">Go back</a>
+    </div>
+</body>
+</html>

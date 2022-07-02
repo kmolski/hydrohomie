@@ -10,26 +10,7 @@
     <title>Users - hydrohomie</title>
 </head>
 <body>
-    <nav th:replace="bare_navbar::navbar(navs=~{::#divContent})">
-        <div th:remove="tag" id="divContent">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <div class="navbar-nav me-auto">
-                    <hr class="bg-light"/>
-                    <a class="nav-link active" aria-current="page" href="#">Users</a>
-                </div>
-                <div class="navbar-nav">
-                    <hr class="bg-light"/>
-                    <form class="align-content-end" name="logout" th:action="@{/logout}" method="post">
-                        <input class="btn btn-link nav-link" type="submit" value="Sign out" />
-                    </form>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <nav th:replace="admin_navbar::navbar('users')"></nav>
 
     <div class="container my-4">
         <div th:switch="${userAccounts.isEmpty}" class="d-flex flex-row mb-4 justify-content-between">
@@ -37,7 +18,7 @@
             <h3 th:case="true">You don't have any users yet.</h3>
             <a href="/admin/createUser" class="btn btn-primary">Create new user</a>
         </div>
-        <table th:if="${not userAccounts.isEmpty}" class="table table-striped table-bordered">
+        <table th:if="${not userAccounts.isEmpty}" class="table table-striped table-hover rounded rounded-3 shadow">
             <thead class="thead-light">
             <tr>
                 <th scope="col">#</th>
@@ -53,7 +34,7 @@
                 <td th:text="${user.username}"></td>
                 <td th:text="${user.enabled}"></td>
                 <td class="d-flex flex-row flex-wrap justify-content-end">
-                    <form th:action="@{/deleteUser/${user.id}}" method="post">
+                    <form th:action="@{/admin/deleteUser/{username}(username=${user.username})}" method="post">
                         <input class="btn btn-danger" type="submit" value="Delete"/>
                     </form>
                 </td>

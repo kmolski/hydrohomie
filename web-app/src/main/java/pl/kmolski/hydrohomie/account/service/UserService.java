@@ -40,4 +40,10 @@ public class UserService implements ReactiveUserDetailsService {
                 .zipWith(userRepository.count())
                 .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
     }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Mono<UserAccount> deleteUserAccount(String username) {
+        return userRepository.findById(username)
+                .flatMap(entity -> userRepository.delete(entity).thenReturn(entity));
+    }
 }
