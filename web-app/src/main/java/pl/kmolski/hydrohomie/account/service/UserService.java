@@ -1,5 +1,6 @@
 package pl.kmolski.hydrohomie.account.service;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -16,17 +17,13 @@ import reactor.core.publisher.Mono;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserService implements ReactiveUserDetailsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final AdminAccount adminAccount;
-
-    UserService(UserRepository userRepository, AdminAccount adminAccount) {
-        this.userRepository = userRepository;
-        this.adminAccount = adminAccount;
-    }
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {

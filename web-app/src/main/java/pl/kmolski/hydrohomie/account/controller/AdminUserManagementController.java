@@ -1,5 +1,6 @@
 package pl.kmolski.hydrohomie.account.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,13 +12,10 @@ import reactor.core.publisher.Mono;
 
 @Controller
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminUserManagementController {
 
     private final UserService userService;
-
-    AdminUserManagementController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping
     public Mono<String> homepage(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {

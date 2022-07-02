@@ -1,5 +1,6 @@
 package pl.kmolski.hydrohomie.coaster.service;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,17 +17,13 @@ import java.time.ZoneId;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CoasterService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CoasterService.class);
 
     private final CoasterRepository coasterRepository;
     private final MeasurementRepository measurementRepository;
-
-    CoasterService(CoasterRepository coasterRepository, MeasurementRepository measurementRepository) {
-        this.coasterRepository = coasterRepository;
-        this.measurementRepository = measurementRepository;
-    }
 
     public Mono<Coaster> getCoasterEntity(String deviceName, Instant now) {
         return coasterRepository.findById(deviceName)

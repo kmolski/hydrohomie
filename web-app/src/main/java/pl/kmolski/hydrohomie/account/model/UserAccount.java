@@ -1,5 +1,6 @@
 package pl.kmolski.hydrohomie.account.model;
 
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collection;
 import java.util.Set;
 
+@Data
 @Table("user_data")
 public class UserAccount implements Account {
 
@@ -15,37 +17,8 @@ public class UserAccount implements Account {
 
     @Id
     private final String username;
-    private String passwordHash;
+    private String password;
     private boolean enabled;
-
-    public UserAccount(String username) {
-        this.username = username;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String getPassword() {
-        return passwordHash;
-    }
-
-    public UserAccount setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-        return this;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public UserAccount setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        return this;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

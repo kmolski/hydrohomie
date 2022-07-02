@@ -1,5 +1,6 @@
 package pl.kmolski.hydrohomie.account.service;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,27 +11,18 @@ import pl.kmolski.hydrohomie.account.model.Account;
 import java.util.Collection;
 import java.util.Set;
 
+@Getter
 @Component
 public class AdminAccount implements Account {
 
     public static final String ADMIN_ROLE = "ROLE_ADMIN";
 
     private final String username;
-    private final String passwordHash;
+    private final String password;
 
     AdminAccount(AdminAccountSettings adminAccountSettings, PasswordEncoder passwordEncoder) {
         this.username = adminAccountSettings.username();
-        this.passwordHash = passwordEncoder.encode(adminAccountSettings.password());
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String getPassword() {
-        return passwordHash;
+        this.password = passwordEncoder.encode(adminAccountSettings.password());
     }
 
     @Override

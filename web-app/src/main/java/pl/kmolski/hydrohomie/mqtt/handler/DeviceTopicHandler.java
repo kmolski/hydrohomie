@@ -1,5 +1,6 @@
 package pl.kmolski.hydrohomie.mqtt.handler;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.handler.GenericHandler;
@@ -13,17 +14,13 @@ import java.time.Clock;
 import java.time.Instant;
 
 @Component
+@RequiredArgsConstructor
 public class DeviceTopicHandler implements GenericHandler<IncomingDeviceTopicMessage> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceTopicHandler.class);
 
     private final CoasterService coasterService;
     private final Clock clock;
-
-    DeviceTopicHandler(CoasterService coasterService, Clock clock) {
-        this.coasterService = coasterService;
-        this.clock = clock;
-    }
 
     @Override
     public Object handle(IncomingDeviceTopicMessage message, MessageHeaders headers) {

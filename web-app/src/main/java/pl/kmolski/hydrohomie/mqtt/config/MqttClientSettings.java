@@ -1,7 +1,6 @@
 package pl.kmolski.hydrohomie.mqtt.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * <p>Configuration properties for the MQTT client.</p>
