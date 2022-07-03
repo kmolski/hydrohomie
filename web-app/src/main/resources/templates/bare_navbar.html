@@ -11,7 +11,7 @@
 <body>
     <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark" style="background-color: #30547b;">
         <div class="container">
-            <a class="navbar-brand me-5" href="#">hydrohomie</a>
+            <a th:href="@{/}" class="navbar-brand me-5">hydrohomie</a>
             <div th:if="${navs}" th:remove="tag">
                 <div th:replace="${navs}"></div>
             </div>

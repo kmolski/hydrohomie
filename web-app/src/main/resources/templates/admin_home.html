@@ -14,7 +14,7 @@
 
     <div class="container my-4">
         <div th:switch="${userAccounts.isEmpty}" class="d-flex flex-row mb-4 justify-content-between">
-            <h3 th:case="false">Managing <span th:text="${userAccounts.getTotalElements()}" th:remove="tag"></span> users</h3>
+            <h3 th:case="false" th:text="${'Managing ' + userAccounts.totalElements + ' users'}"></h3>
             <h3 th:case="true">You don't have any users yet.</h3>
             <a th:href="@{/admin/createUser}" class="btn btn-primary">Create new user</a>
         </div>
@@ -62,7 +62,7 @@
                 </li>
                 <li th:class="${'page-item ' + (userAccounts.hasNext() ? '' : 'disabled')}">
                     <div th:switch="${userAccounts.hasNext()}" th:remove="tag">
-                        <a class="page-link" th:case="true" th:href="${'?page=' + userAccounts.nextPageable().getPageNumber()}">Next</a>
+                        <a class="page-link" th:case="true" th:href="${'?page=' + userAccounts.nextPageable().pageNumber}">Next</a>
                         <a class="page-link" th:case="false" href="#" tabindex="-1" aria-disabled="true">Next</a>
                     </div>
                 </li>
