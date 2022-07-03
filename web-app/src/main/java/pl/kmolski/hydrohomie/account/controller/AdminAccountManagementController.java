@@ -1,19 +1,52 @@
 package pl.kmolski.hydrohomie.account.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import pl.kmolski.hydrohomie.account.dto.NewUserDto;
 import pl.kmolski.hydrohomie.account.service.UserService;
 import pl.kmolski.hydrohomie.webmvc.util.PaginationUtil;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
+
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-public class AdminUserManagementController {
+public class AdminAccountManagementController {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(AdminAccountManagementController.class);
 
     private final UserService userService;
+
+    @GetMapping("/createUser")
+    public String createUserForm(NewUserDto newUserDto) {
+        return "admin_create_user";
+    }
+
+    @PostMapping("/createUser")
+    public Mono<String> createUserAction(@Valid NewUserDto newUserDto, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return Mono.just("admin_create_user");
+        }
+        model.addAttribute("redirect", "/admin");
+        return userService.createUserAccount(newUserDto.getUsername(), newUserDto.getPassword(), newUserDto.isEnabled())
+                .map(account -> {
+                    var message = "Successfully created user '" + account.getUsername() + "'.";
+                    model.addAttribute("message", message);
+                    return "admin_success";
+                })
+                .onErrorResume(DataIntegrityViolationException.class, exc -> {
+                    result.addError(new ObjectError("username", "User with this username already exists"));
+                    return Mono.just("admin_create_user");
+                });
+    }
 
     @GetMapping
     public Mono<String> homepage(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {

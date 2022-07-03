@@ -1,5 +1,6 @@
 package pl.kmolski.hydrohomie.account.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 @Data
 @Table("user_data")
+@AllArgsConstructor
 public class UserAccount implements Account {
 
     public static final String USER_ROLE = "ROLE_USER";

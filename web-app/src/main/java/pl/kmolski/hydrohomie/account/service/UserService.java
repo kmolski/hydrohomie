@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.kmolski.hydrohomie.account.model.UserAccount;
@@ -22,6 +23,7 @@ public class UserService implements ReactiveUserDetailsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AdminAccount adminAccount;
 
@@ -32,6 +34,12 @@ public class UserService implements ReactiveUserDetailsService {
         } else {
             return userRepository.findByUsername(username);
         }
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Mono<UserAccount> createUserAccount(String username, String rawPassword, boolean enabled) {
+        var encodedPassword = passwordEncoder.encode(rawPassword);
+        return userRepository.create(username, encodedPassword, enabled);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
