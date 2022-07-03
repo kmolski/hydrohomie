@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>Create user - hydrohomie</title>
+</head>
+<body>
+    <nav th:replace="admin_navbar::navbar('users')"></nav>
+
+    <div class="container my-4 col-sm-6 col-sm-offset-3">
+        <h3 class="mb-4">Add user account</h3>
+        <form th:action="@{/admin/createUser}" th:object="${newUserDto}" id="add_user" name="add_user" method="post">
+            <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger">
+                <ul class="mb-0">
+                    <li th:each="err : ${#fields.allErrors()}" th:text="${err}"/>
+                </ul>
+            </div>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username:</label>
+                <input type="text" class="form-control" th:field="*{username}" id="username" minlength="1" maxlength="63" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password:</label>
+                <input type="password" class="form-control" th:field="*{password}" id="password" maxlength="127" required>
+            </div>
+            <div class="mb-3">
+                <label for="pwConfirm" class="form-label">Confirm password:</label>
+                <input type="password" class="form-control" th:field="*{pwConfirm}" id="pwConfirm" maxlength="127" required>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input type="checkbox" class="form-check-input" th:field="*{enabled}" id="enabled" checked>
+                <label for="enabled" class="form-check-label">Enabled</label>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Submit">
+        </form>
+    </div>
+</body>
+</html>
