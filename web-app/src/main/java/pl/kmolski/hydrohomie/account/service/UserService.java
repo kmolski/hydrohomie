@@ -42,6 +42,13 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Mono<UserAccount> setEnabledUserAccount(String username, boolean enabled) {
+        return userRepository.findById(username)
+                .map(entity -> entity.setEnabled(enabled))
+                .flatMap(userRepository::save);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<UserAccount> deleteUserAccount(String username) {
         return userRepository.findById(username)
                 .flatMap(entity -> userRepository.delete(entity).thenReturn(entity));

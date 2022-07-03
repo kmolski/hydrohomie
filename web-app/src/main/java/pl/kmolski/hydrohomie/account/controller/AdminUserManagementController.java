@@ -24,6 +24,19 @@ public class AdminUserManagementController {
                 });
     }
 
+    @PostMapping("/setEnabledUser/{id}")
+    public Mono<String> setEnabledUserAction(@PathVariable("id") String username,
+                                             @RequestParam("enabled") boolean enabled,
+                                             Model model) {
+        model.addAttribute("redirect", "/admin");
+        return userService.setEnabledUserAccount(username, enabled)
+                .map(account -> {
+                    var message = "Successfully updated user '" + account.getUsername() + "'.";
+                    model.addAttribute("message", message);
+                    return "admin_success";
+                });
+    }
+
     @PostMapping("/deleteUser/{id}")
     public Mono<String> deleteUserAction(@PathVariable("id") String username, Model model) {
         model.addAttribute("redirect", "/admin");
@@ -32,7 +45,6 @@ public class AdminUserManagementController {
                     var message = "Successfully deleted user '" + account.getUsername() + "'.";
                     model.addAttribute("message", message);
                     return "admin_success";
-                })
-                .onErrorReturn("admin_error");
+                });
     }
 }
