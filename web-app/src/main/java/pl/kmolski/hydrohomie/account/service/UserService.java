@@ -52,8 +52,9 @@ public class UserService implements ReactiveUserDetailsService {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and principal.username == username)")
     public Mono<UserAccount> updateUserPassword(String username, PlaintextPassword password) {
+        var encodedPassword = passwordEncoder.encode(password.plaintext());
         return userRepository.findById(username)
-                .map(entity -> entity.setPassword(passwordEncoder.encode(password.plaintext())))
+                .map(entity -> entity.setPassword(encodedPassword))
                 .flatMap(userRepository::save);
     }
 
