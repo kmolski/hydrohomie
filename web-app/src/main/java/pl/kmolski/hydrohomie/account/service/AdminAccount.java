@@ -2,7 +2,6 @@ package pl.kmolski.hydrohomie.account.service;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import pl.kmolski.hydrohomie.account.config.AdminAccountSettings;
@@ -11,11 +10,11 @@ import pl.kmolski.hydrohomie.account.model.Account;
 import java.util.Collection;
 import java.util.Set;
 
+import static pl.kmolski.hydrohomie.account.model.AccountRole.ROLE_ADMIN;
+
 @Getter
 @Component
 public class AdminAccount implements Account {
-
-    public static final String ADMIN_ROLE = "ROLE_ADMIN";
 
     private final String username;
     private final String password;
@@ -32,6 +31,6 @@ public class AdminAccount implements Account {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Set.of(new SimpleGrantedAuthority(ADMIN_ROLE));
+        return Set.of(ROLE_ADMIN.authority());
     }
 }

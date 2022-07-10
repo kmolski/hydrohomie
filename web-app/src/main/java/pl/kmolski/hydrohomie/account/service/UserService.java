@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.kmolski.hydrohomie.account.dto.PlaintextPassword;
 import pl.kmolski.hydrohomie.account.model.UserAccount;
 import pl.kmolski.hydrohomie.account.repo.UserRepository;
 import reactor.core.publisher.Mono;
@@ -37,8 +38,8 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Mono<UserAccount> createUserAccount(String username, String rawPassword, boolean enabled) {
-        var encodedPassword = passwordEncoder.encode(rawPassword);
+    public Mono<UserAccount> createUserAccount(String username, PlaintextPassword password, boolean enabled) {
+        var encodedPassword = passwordEncoder.encode(password.plaintext());
         return userRepository.create(username, encodedPassword, enabled);
     }
 
@@ -47,6 +48,13 @@ public class UserService implements ReactiveUserDetailsService {
         return userRepository.findAllBy(pageable).collectList()
                 .zipWith(userRepository.count())
                 .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and principal.username == username)")
+    public Mono<UserAccount> updateUserPassword(String username, PlaintextPassword password) {
+        return userRepository.findById(username)
+                .map(entity -> entity.setPassword(passwordEncoder.encode(password.plaintext())))
+                .flatMap(userRepository::save);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

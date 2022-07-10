@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import pl.kmolski.hydrohomie.account.dto.ChangeUserPasswordDto;
 import pl.kmolski.hydrohomie.account.dto.NewUserDto;
 import pl.kmolski.hydrohomie.account.service.UserService;
 import pl.kmolski.hydrohomie.webmvc.util.PaginationUtil;
@@ -54,6 +55,28 @@ public class AdminAccountManagementController {
                 .map(accounts -> {
                     model.addAttribute("userAccounts", accounts);
                     return "admin_home";
+                });
+    }
+
+    @GetMapping("/changePassword/{id}")
+    public String changePasswordForm(@PathVariable("id") String username, Model model,
+                                     ChangeUserPasswordDto changeUserPasswordDto) {
+        model.addAttribute("username", username);
+        return "admin_change_password";
+    }
+
+    @PostMapping("/changePassword/{id}")
+    public Mono<String> changePasswordAction(@PathVariable("id") String username, Model model,
+                                             @Valid ChangeUserPasswordDto changePasswordDto, BindingResult result) {
+        if (result.hasErrors()) {
+            return Mono.just("admin_change_password");
+        }
+        model.addAttribute("redirect", "/admin");
+        return userService.updateUserPassword(username, changePasswordDto.getPassword())
+                .map(account -> {
+                    var message = "Successfully changed password for user '" + username + "'.";
+                    model.addAttribute("message", message);
+                    return "admin_success";
                 });
     }
 

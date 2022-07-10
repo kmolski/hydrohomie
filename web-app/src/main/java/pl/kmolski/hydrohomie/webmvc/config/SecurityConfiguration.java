@@ -9,9 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
-
-import static pl.kmolski.hydrohomie.account.service.AdminAccount.ADMIN_ROLE;
-import static pl.kmolski.hydrohomie.account.model.UserAccount.USER_ROLE;
+import pl.kmolski.hydrohomie.account.model.AccountRole;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -27,8 +25,8 @@ public class SecurityConfiguration {
         return http.authorizeExchange()
                 .pathMatchers("/actuator/health").permitAll()
                 .pathMatchers("/login", "/webjars/**").permitAll()
-                .pathMatchers("/admin/**").hasAuthority(ADMIN_ROLE)
-                .pathMatchers("/user/**").hasAuthority(USER_ROLE)
+                .pathMatchers("/admin/**").hasAuthority(AccountRole.ROLE_ADMIN.name())
+                .pathMatchers("/user/**").hasAuthority(AccountRole.ROLE_USER.name())
                 .pathMatchers("/**").authenticated()
                     .and()
                 .formLogin()
