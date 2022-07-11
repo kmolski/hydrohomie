@@ -5,6 +5,10 @@ import pl.kmolski.hydrohomie.account.dto.WithPasswordConfirmation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+/**
+ * <p>Implementation of the {@link MatchingPasswords} validator logic.</p>
+ * <p>Accepts non-null {@link WithPasswordConfirmation}.</p>
+ */
 public class MatchingPasswordsValidator implements ConstraintValidator<MatchingPasswords, WithPasswordConfirmation> {
 
     @Override
