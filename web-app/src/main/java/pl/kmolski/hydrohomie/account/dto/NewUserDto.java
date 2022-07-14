@@ -3,6 +3,7 @@ package pl.kmolski.hydrohomie.account.dto;
 import lombok.Data;
 import pl.kmolski.hydrohomie.account.validator.MatchingPasswords;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -16,8 +17,8 @@ public class NewUserDto implements WithPasswordConfirmation {
     @Pattern(regexp = "^(\\w+)$", message = "The username can only contain letters, numbers and '_' separators")
     private final String username;
 
-    private final PlaintextPassword password;
-    private final PlaintextPassword pwConfirm;
+    private final @Valid PlaintextPassword password;
+    private final @Valid PlaintextPassword pwConfirm;
 
-    private final boolean enabled;
+    private boolean enabled;
 }

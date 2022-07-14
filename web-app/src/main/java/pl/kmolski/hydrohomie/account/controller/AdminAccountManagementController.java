@@ -22,7 +22,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AdminAccountManagementController {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(AdminAccountManagementController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminAccountManagementController.class);
 
     private final UserService userService;
 

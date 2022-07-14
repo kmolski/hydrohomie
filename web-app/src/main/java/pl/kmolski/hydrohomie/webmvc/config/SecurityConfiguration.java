@@ -11,15 +11,29 @@ import org.springframework.security.web.server.authentication.RedirectServerAuth
 import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
 import pl.kmolski.hydrohomie.account.model.AccountRole;
 
+/**
+ * Global web security and password encoding configuration.
+ */
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfiguration {
 
+    /**
+     * Configure the Argon2id password encoder, as recommended by the
+     * <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP Cheat Sheet</a>
+     *
+     * @return password encoder using the Argon2id algorithm
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new Argon2PasswordEncoder();
     }
 
+    /**
+     * Configure the Spring {@link SecurityWebFilterChain}.
+     * @param http the web security configurator
+     * @return the configured {@link SecurityWebFilterChain} instance
+     */
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http.authorizeExchange()

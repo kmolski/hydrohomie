@@ -15,8 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.kmolski.hydrohomie.account.dto.PlaintextPassword;
 import pl.kmolski.hydrohomie.account.model.UserAccount;
 import pl.kmolski.hydrohomie.account.repo.UserRepository;
+import pl.kmolski.hydrohomie.webmvc.exception.EntityNotFoundException;
 import reactor.core.publisher.Mono;
 
+/**
+ * User account management service. Operations like user creation, removal,
+ * password changes, account enable/disable & user list fetch are handled here.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -55,19 +60,22 @@ public class UserService implements ReactiveUserDetailsService {
         var encodedPassword = passwordEncoder.encode(password.plaintext());
         return userRepository.findById(username)
                 .map(entity -> entity.setPassword(encodedPassword))
-                .flatMap(userRepository::save);
+                .flatMap(userRepository::save)
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("User not found")));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<UserAccount> setEnabledUserAccount(String username, boolean enabled) {
         return userRepository.findById(username)
                 .map(entity -> entity.setEnabled(enabled))
-                .flatMap(userRepository::save);
+                .flatMap(userRepository::save)
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("User not found")));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<UserAccount> deleteUserAccount(String username) {
         return userRepository.findById(username)
-                .flatMap(entity -> userRepository.delete(entity).thenReturn(entity));
+                .flatMap(entity -> userRepository.delete(entity).thenReturn(entity))
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("User not found")));
     }
 }
