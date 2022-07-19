@@ -2,17 +2,6 @@
 
 Firmware for the smart coaster device, based on the Arduino ESP32 platform and open-source libraries.
 
-Dependencies
-------------
-
-- PlatformIO toolset
-- Arduino ESP32 platform
-- [Arduino LiquidCrystal library](https://www.arduino.cc/en/Reference/LiquidCrystal)
-- [Arduino WiFi library](https://www.arduino.cc/en/Reference/WiFi)
-- [knolleary/PubSubClient](https://github.com/knolleary/pubsubclient)
-- [bblanchon/ArduinoJson](https://github.com/bblanchon/ArduinoJson)
-- [bogde/HX711](https://github.com/bogde/HX711)
-
 Setup instructions
 -----------
 
@@ -32,6 +21,17 @@ Setup instructions
 
 ### Firmware flashing
 11. Build & flash the device with `pio run -t upload`.
+
+Dependencies
+------------
+
+- [PlatformIO toolset](https://platformio.org)
+- [Arduino ESP32 platform](https://github.com/espressif/arduino-esp32)
+- [Arduino LiquidCrystal library](https://www.arduino.cc/en/Reference/LiquidCrystal)
+- [Arduino WiFi library](https://www.arduino.cc/en/Reference/WiFi)
+- [knolleary/PubSubClient](https://github.com/knolleary/pubsubclient)
+- [bblanchon/ArduinoJson](https://github.com/bblanchon/ArduinoJson)
+- [bogde/HX711](https://github.com/bogde/HX711)
 
 License
 -------
