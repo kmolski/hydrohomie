@@ -37,7 +37,7 @@ public class AdminAccountManagementController {
             return Mono.just("admin_create_user");
         }
         model.addAttribute("redirect", "/admin");
-        return userService.createUserAccount(newUserDto.getUsername(), newUserDto.getPassword(), newUserDto.isEnabled())
+        return userService.createAccount(newUserDto.getUsername(), newUserDto.getPassword(), newUserDto.isEnabled())
                 .map(account -> {
                     var message = "Successfully created user '" + account.getUsername() + "'.";
                     model.addAttribute("message", message);
@@ -51,7 +51,7 @@ public class AdminAccountManagementController {
 
     @GetMapping
     public Mono<String> homepage(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
-        return userService.getAllUserAccounts(PaginationUtil.fromPage(page))
+        return userService.getAllAccounts(PaginationUtil.fromPage(page))
                 .map(accounts -> {
                     model.addAttribute("userAccounts", accounts);
                     return "admin_home";
@@ -72,7 +72,7 @@ public class AdminAccountManagementController {
             return Mono.just("admin_change_password");
         }
         model.addAttribute("redirect", "/admin");
-        return userService.updateUserPassword(username, changePasswordDto.getPassword())
+        return userService.updatePassword(username, changePasswordDto.getPassword())
                 .map(account -> {
                     var message = "Successfully changed password for user '" + username + "'.";
                     model.addAttribute("message", message);
@@ -85,7 +85,7 @@ public class AdminAccountManagementController {
                                              @RequestParam("enabled") boolean enabled,
                                              Model model) {
         model.addAttribute("redirect", "/admin");
-        return userService.setEnabledUserAccount(username, enabled)
+        return userService.setAccountEnabled(username, enabled)
                 .map(account -> {
                     var message = "Successfully updated user '" + account.getUsername() + "'.";
                     model.addAttribute("message", message);
@@ -96,7 +96,7 @@ public class AdminAccountManagementController {
     @PostMapping("/deleteUser/{id}")
     public Mono<String> deleteUserAction(@PathVariable("id") String username, Model model) {
         model.addAttribute("redirect", "/admin");
-        return userService.deleteUserAccount(username)
+        return userService.deleteAccount(username)
                 .map(account -> {
                     var message = "Successfully deleted user '" + account.getUsername() + "'.";
                     model.addAttribute("message", message);

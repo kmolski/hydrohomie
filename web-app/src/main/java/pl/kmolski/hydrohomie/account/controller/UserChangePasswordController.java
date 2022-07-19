@@ -37,7 +37,7 @@ public class UserChangePasswordController {
             return Mono.just("user_change_password");
         }
         model.addAttribute("redirect", "/user");
-        return userService.updateUserPassword(authentication.getName(), changePasswordDto.getPassword())
+        return userService.updatePassword(authentication.getName(), changePasswordDto.getPassword())
                 .map(account -> {
                     var message = "Successfully changed password.";
                     model.addAttribute("message", message);

@@ -42,10 +42,10 @@ class AdminAccountManagementControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private WebTestClient webTestClient;
-
     @MockBean
     private UserService userService;
+
+    private WebTestClient webTestClient;
 
     @BeforeEach
     void setupWebTestClient() {
@@ -111,7 +111,7 @@ class AdminAccountManagementControllerTest {
         var encodedPassword = passwordEncoder.encode(password.plaintext());
 
         var account = new UserAccount(username, encodedPassword, true);
-        when(userService.createUserAccount(username, password, true)).thenReturn(Mono.just(account));
+        when(userService.createAccount(username, password, true)).thenReturn(Mono.just(account));
 
         webTestClient.mutateWith(csrf()).post().uri("/admin/createUser")
                 .body(fromFormData("username", username)
@@ -177,7 +177,7 @@ class AdminAccountManagementControllerTest {
         var users = usernames.stream().map(name -> new UserAccount(name, "", true)).toList();
         var page = new PageImpl<>(users);
 
-        when(userService.getAllUserAccounts(any())).thenReturn(Mono.just(page));
+        when(userService.getAllAccounts(any())).thenReturn(Mono.just(page));
         webTestClient.get().uri("/admin").exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
@@ -196,7 +196,7 @@ class AdminAccountManagementControllerTest {
         var newEncodedPassword = passwordEncoder.encode(newPassword.plaintext());
 
         var account = new UserAccount(username, newEncodedPassword, true);
-        when(userService.updateUserPassword(username, newPassword)).thenReturn(Mono.just(account));
+        when(userService.updatePassword(username, newPassword)).thenReturn(Mono.just(account));
 
         webTestClient.mutateWith(csrf()).post().uri("/admin/changePassword/" + username)
                 .body(fromFormData("password", newPassword.plaintext()).with("pwConfirm", newPassword.plaintext()))
@@ -236,7 +236,7 @@ class AdminAccountManagementControllerTest {
         var username = "james_t_kirk";
         var newPassword = new PlaintextPassword("enterprise");
 
-        when(userService.updateUserPassword(username, newPassword)).thenThrow(EntityNotFoundException.class);
+        when(userService.updatePassword(username, newPassword)).thenThrow(EntityNotFoundException.class);
 
         webTestClient.mutateWith(csrf()).post().uri("/admin/changePassword/" + username)
                 .body(fromFormData("password", newPassword.plaintext()).with("pwConfirm", newPassword.plaintext()))
@@ -249,7 +249,7 @@ class AdminAccountManagementControllerTest {
         var username = "james_t_kirk";
 
         var account = new UserAccount(username, null, false);
-        when(userService.setEnabledUserAccount(username, false)).thenReturn(Mono.just(account));
+        when(userService.setAccountEnabled(username, false)).thenReturn(Mono.just(account));
 
         webTestClient.mutateWith(csrf()).post().uri("/admin/setEnabledUser/" + username + "?enabled=false")
                 .exchange()
@@ -271,7 +271,7 @@ class AdminAccountManagementControllerTest {
     void setEnabledUserActionWithNonexistentUserFails() {
         var username = "james_t_kirk";
 
-        when(userService.setEnabledUserAccount(username, false)).thenThrow(EntityNotFoundException.class);
+        when(userService.setAccountEnabled(username, false)).thenThrow(EntityNotFoundException.class);
 
         webTestClient.mutateWith(csrf()).post().uri("/admin/setEnabledUser/" + username + "?enabled=false")
                 .exchange()
@@ -283,7 +283,7 @@ class AdminAccountManagementControllerTest {
         var username = "james_t_kirk";
 
         var account = new UserAccount(username, null, false);
-        when(userService.deleteUserAccount(username)).thenReturn(Mono.just(account));
+        when(userService.deleteAccount(username)).thenReturn(Mono.just(account));
 
         webTestClient.mutateWith(csrf()).post().uri("/admin/deleteUser/" + username)
                 .exchange()
@@ -305,7 +305,7 @@ class AdminAccountManagementControllerTest {
     void deleteUserActionWithNonexistentUserFails() {
         var username = "james_t_kirk";
 
-        when(userService.deleteUserAccount(username)).thenThrow(EntityNotFoundException.class);
+        when(userService.deleteAccount(username)).thenThrow(EntityNotFoundException.class);
 
         webTestClient.mutateWith(csrf()).post().uri("/admin/deleteUser/" + username)
                 .exchange()
