@@ -8,6 +8,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+/**
+ * <p>
+ *     Data class describing the user to be created. Contains the
+ *     username, password, password confirmation and enabled status.
+ * </p>
+ * <p>The password and password confirmation must be the same.</p>
+ */
 @Data
 @MatchingPasswords
 public class NewUserDto implements WithPasswordConfirmation {

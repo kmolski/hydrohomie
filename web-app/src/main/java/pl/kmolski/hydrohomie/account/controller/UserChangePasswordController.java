@@ -1,8 +1,6 @@
 package pl.kmolski.hydrohomie.account.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,20 +14,37 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
+/**
+ * User-accessible controller providing account self-management.
+ */
 @Controller
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserChangePasswordController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserChangePasswordController.class);
-
     private final UserService userService;
 
+    /**
+     * Populate and show the user's change own password form.
+     *
+     * @param model the template model
+     * @param changeUserPasswordDto new DTO for the password change
+     * @return the change password form
+     */
     @GetMapping("/changePassword")
     public String changePasswordForm(Model model, ChangeUserPasswordDto changeUserPasswordDto) {
         return "user_change_password";
     }
 
+    /**
+     * Change the user's own password to the one specified in the change password form.
+     *
+     * @param model the template model
+     * @param changePasswordDto DTO for the password change
+     * @param result the result of DTO binding (includes validation errors)
+     * @param authentication the current user's authentication object
+     * @return the success page or form with errors
+     */
     @PostMapping("/changePassword")
     public Mono<String> changePasswordAction(Model model, @Valid ChangeUserPasswordDto changePasswordDto,
                                              BindingResult result, Authentication authentication) {

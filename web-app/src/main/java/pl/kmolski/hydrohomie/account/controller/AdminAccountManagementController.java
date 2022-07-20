@@ -17,6 +17,9 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
+/**
+ * Admin-accessible controller providing the user management functionality.
+ */
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -26,11 +29,25 @@ public class AdminAccountManagementController {
 
     private final UserService userService;
 
+    /**
+     * Populate and show the create new user account form.
+     *
+     * @param newUserDto new DTO for the created user
+     * @return the create user account form
+     */
     @GetMapping("/createUser")
     public String createUserForm(NewUserDto newUserDto) {
         return "admin_create_user";
     }
 
+    /**
+     * Create the user account specified in the create account form.
+     *
+     * @param model the template model
+     * @param newUserDto DTO for the new user account
+     * @param result the result of DTO binding (includes validation errors)
+     * @return the success page or form with errors
+     */
     @PostMapping("/createUser")
     public Mono<String> createUserAction(@Valid NewUserDto newUserDto, BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -45,10 +62,18 @@ public class AdminAccountManagementController {
                 })
                 .onErrorResume(DataIntegrityViolationException.class, exc -> {
                     result.addError(new ObjectError("username", "User with this username already exists"));
+                    LOGGER.warn("Account with username {} already exists", newUserDto.getUsername());
                     return Mono.just("admin_create_user");
                 });
     }
 
+    /**
+     * Populate and show the homepage/user account list view.
+     *
+     * @param page the page of user accounts to show
+     * @param model the template model
+     * @return the user account list view
+     */
     @GetMapping
     public Mono<String> homepage(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
         return userService.getAllAccounts(PaginationUtil.fromPage(page))
@@ -58,6 +83,14 @@ public class AdminAccountManagementController {
                 });
     }
 
+    /**
+     * Populate and show the change password form.
+     *
+     * @param username the name of the user to update
+     * @param model the template model
+     * @param changeUserPasswordDto new DTO for the password change
+     * @return the change password form
+     */
     @GetMapping("/changePassword/{id}")
     public String changePasswordForm(@PathVariable("id") String username, Model model,
                                      ChangeUserPasswordDto changeUserPasswordDto) {
@@ -65,6 +98,15 @@ public class AdminAccountManagementController {
         return "admin_change_password";
     }
 
+    /**
+     * Change the user's password to the one specified in the change password form.
+     *
+     * @param username the name of the user to update
+     * @param model the template model
+     * @param changePasswordDto DTO for the password change
+     * @param result the result of DTO binding (includes validation errors)
+     * @return the success page or form with errors
+     */
     @PostMapping("/changePassword/{id}")
     public Mono<String> changePasswordAction(@PathVariable("id") String username, Model model,
                                              @Valid ChangeUserPasswordDto changePasswordDto, BindingResult result) {
@@ -80,6 +122,14 @@ public class AdminAccountManagementController {
                 });
     }
 
+    /**
+     * Set the user's enabled status to the one specified in the parameter 'enabled'.
+     *
+     * @param username the name of the user to update
+     * @param enabled the desired enabled status
+     * @param model the template model
+     * @return the success page
+     */
     @PostMapping("/setEnabledUser/{id}")
     public Mono<String> setEnabledUserAction(@PathVariable("id") String username,
                                              @RequestParam("enabled") boolean enabled,
@@ -93,6 +143,13 @@ public class AdminAccountManagementController {
                 });
     }
 
+    /**
+     * Delete the user specified in the path variable 'id'.
+     *
+     * @param username the name of the user to delete
+     * @param model the template model
+     * @return the success page
+     */
     @PostMapping("/deleteUser/{id}")
     public Mono<String> deleteUserAction(@PathVariable("id") String username, Model model) {
         model.addAttribute("redirect", "/admin");

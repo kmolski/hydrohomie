@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1_add_user_data
+      author: kmolski
+      changes:
+        - createTable:
+            tableName: user_data
+            columns:
+              - column:
+                  name: username
+                  type: varchar(63)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: password
+                  type: varchar(127)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: enabled
+                  type: boolean
+                  defaultValue: true
+                  constraints:
+                    nullable: false

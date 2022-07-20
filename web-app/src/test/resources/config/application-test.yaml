@@ -1,0 +1,18 @@
+admin:
+  username: admin
+  password: admin
+logging:
+  level:
+    root: INFO
+    pl.kmolski.hydrohomie: DEBUG
+mqtt:
+  url: tcp://localhost:1883
+spring:
+  liquibase:
+    url: jdbc:postgresql://localhost:5432/hydrohomie
+    user: postgres
+    password: postgres
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/hydrohomie
+    username: postgres
+    password: postgres
