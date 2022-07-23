@@ -23,7 +23,7 @@ jobs:
         
     - name: Run tests with Gradle
       working-directory: ./web-app
-      run: ./gradlew test jacocoTestReport
+      run: ./gradlew test
       
     - name: Generate JaCoCo Badge
       uses: cicirello/jacoco-badge-generator@v2
