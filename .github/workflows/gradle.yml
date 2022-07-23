@@ -41,7 +41,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: jacoco-report
-        path: build/reports/jacoco/
+        path: web-app/build/reports/jacoco/
     
     - name: Build Spring Boot JAR with Gradle
       working-directory: ./web-app
@@ -51,4 +51,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: spring-boot-jar
-        path: build/libs/
+        path: web-app/build/libs/
