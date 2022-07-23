@@ -1,6 +1,6 @@
 # hydrohomie - web application
 
-![Build status](https://github.com/kmolski/hydrohomie/actions/workflows/gradle.yml/badge.svg)
+[![Build status](https://github.com/kmolski/hydrohomie/actions/workflows/gradle.yml/badge.svg)](https://github.com/kmolski/hydrohomie/actions)
 [![Coverage](.github/badges/jacoco.svg)](https://github.com/kmolski/hydrohomie/actions/workflows/gradle.yml)
 
 Companion web app for the smart coaster device, built with Java 17 and open-source tools.
