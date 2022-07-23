@@ -60,10 +60,7 @@ test {
 
 jacocoTestReport {
     dependsOn test
-    sourceSets sourceSets.main
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
     reports {
-        xml.enabled false
         csv.enabled true
     }
 }
