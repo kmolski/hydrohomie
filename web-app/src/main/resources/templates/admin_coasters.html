@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>Coasters - hydrohomie</title>
+</head>
+<body>
+    <nav th:replace="admin_navbar::navbar('coasters')"></nav>
+
+    <div class="container my-4">
+        <div th:switch="${coasters.isEmpty}" class="d-flex flex-row mb-4 justify-content-between">
+            <h3 th:case="false" th:text="${'There are ' + coasters.totalElements + ' unassigned coasters'}"></h3>
+            <h3 th:case="true">There are no unassigned coasters.</h3>
+        </div>
+        <table th:if="${not coasters.isEmpty}" class="table table-hover rounded rounded-3 shadow-sm">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Device ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Timezone</th>
+                <th scope="col">Place</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="coaster, it : ${coasters.content}">
+                <th th:text="${it.count}" scope="row"></th>
+                <td th:text="${coaster.deviceName}"></td>
+                <td th:text="${coaster.displayName}"></td>
+                <td th:text="${coaster.timezone}"></td>
+                <td th:text="${coaster.place}"></td>
+                <td class="d-flex flex-row flex-wrap justify-content-end">
+                    <a th:href="@{/admin/coasters/assignCoaster/{id}(id=${coaster.deviceName})}" class="btn btn-primary">Assign</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <nav th:replace="pagination::pagination(${coasters})"></nav>
+    </div>
+</body>
+</html>

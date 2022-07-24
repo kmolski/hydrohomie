@@ -13,11 +13,28 @@
     <nav th:replace="user_navbar::navbar"></nav>
 
     <div class="container my-4">
+        <div th:switch="${coasters.isEmpty}" class="d-flex flex-row mb-4 justify-content-between">
+            <h3 th:case="false" th:text="${'You have ' + coasters.totalElements + ' coasters'}"></h3>
+            <h3 th:case="true">You don't have any assigned coasters.</h3>
+        </div>
         <div class="row">
-            <div class="col-sm">
-                <h1>Welcome to hydrohomie!</h1> <br/>
+            <div th:each="coaster, it : ${coasters.content}" class="col-sm-6 p-2">
+                <div class="card rounded rounded-3 shadow-sm">
+                    <div class="card-body">
+                        <h5 th:text="${coaster.displayName ?: coaster.deviceName}" class="card-title"/>
+                        <p th:if="${coaster.displayName}" th:text="${'Device ID: ' + coaster.deviceName}" class="m-0"/>
+                        <p th:text="${'Timezone: ' + coaster.timezone}" class="m-0"/>
+                        <p th:if="${coaster.place}" th:text="${'Place: ' + coaster.place}" class="m-0"/>
+                    </div>
+                    <div class="card-footer">
+                        <small th:text="${'Last active on ' +
+                                   #temporals.format(coaster.inactiveSince.atZone(coaster.timezone), 'yyyy-MM-dd')}"
+                               class="text-muted"/>
+                    </div>
+                </div>
             </div>
         </div>
+        <nav th:replace="pagination::pagination(${coasters})"></nav>
     </div>
 </body>
 </html>

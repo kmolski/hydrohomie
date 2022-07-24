@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>Assign coaster to user - hydrohomie</title>
+</head>
+<body>
+    <nav th:replace="admin_navbar::navbar('coaster_assign')"></nav>
+
+    <div class="container my-4">
+        <div th:switch="${userAccounts.isEmpty}" class="d-flex flex-row mb-4 justify-content-between">
+            <h3 th:case="false" th:text="${userAccounts.totalElements + ' users available'}"></h3>
+            <h3 th:case="true">No users are available for assignment.</h3>
+        </div>
+        <table th:if="${not userAccounts.isEmpty}" class="table table-hover rounded rounded-3 shadow-sm">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!--/*@thymesVar id="user" type="pl.kmolski.hydrohomie.account.model.UserAccount"*/-->
+            <tr th:each="user, it : ${userAccounts.content}">
+                <th th:text="${it.count}" scope="row"></th>
+                <td th:text="${user.username}"></td>
+                <td class="d-flex flex-row flex-wrap justify-content-end">
+                    <form th:action="@{/admin/coasters/assignCoaster/{id}(id=${deviceName},userId=${user.username})}" method="post">
+                        <input class="btn btn-primary ms-2" type="submit" value="Assign to user"/>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <nav th:replace="pagination::pagination(${userAccounts})"></nav>
+    </div>
+</body>
+</html>

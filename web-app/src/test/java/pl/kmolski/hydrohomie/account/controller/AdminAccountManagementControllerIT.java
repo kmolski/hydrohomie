@@ -148,4 +148,22 @@ class AdminAccountManagementControllerIT {
         var account = userRepository.findById(username).block();
         assertNull(account, "User account was not removed");
     }
+
+    @Test
+    void createUserActionWithDuplicateUsernameFails() {
+        var username = "james_t_kirk004";
+        var password = new PlaintextPassword("enterprise");
+        var encodedPassword = passwordEncoder.encode(password.plaintext());
+        userRepository.create(username, encodedPassword, true).block();
+
+        webTestClient.mutateWith(csrf()).post().uri("/admin/createUser")
+                .body(fromFormData("username", username)
+                        .with("password", password.plaintext())
+                        .with("pwConfirm", password.plaintext())
+                        .with("enabled", "true"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(containsString("User with this username already exists"));
+    }
 }

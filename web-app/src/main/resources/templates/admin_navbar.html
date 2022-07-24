@@ -20,6 +20,8 @@
                     <hr class="bg-light"/>
                     <a th:class="${'nav-link ' + (current == 'users' ? 'active' : '')}"
                        th:href="${current == 'users' ? '#' : '/admin'}">Users</a>
+                    <a th:class="${'nav-link ' + (current == 'coasters' ? 'active' : '')}"
+                       th:href="${current == 'coasters' ? '#' : '/admin/coasters'}">Coasters</a>
                 </div>
                 <div class="navbar-nav">
                     <hr class="bg-light"/>
