@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>hydrohomie</title>
+</head>
+<body>
+    <nav th:fragment="pagination(currentPage)" th:if="${not currentPage.isEmpty}">
+        <ul class="pagination justify-content-end">
+            <li th:class="${'page-item ' + (currentPage.hasPrevious() ? '' : 'disabled')}">
+                <div th:switch="${currentPage.hasPrevious()}" th:remove="tag">
+                    <a class="page-link" th:case="true" th:href="${'?page=' + currentPage.previousPageable().pageNumber}">Previous</a>
+                    <a class="page-link" th:case="false" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                </div>
+            </li>
+            <li th:class="${'page-item ' + (it.index == currentPage.number ? 'active' : '')}"
+                th:each="pageNumber, it : ${#numbers.sequence(1, currentPage.totalPages)}"
+                th:switch="${it.index != currentPage.number}">
+                <a class="page-link" th:case="true" th:href="${'?page=' + it.index}" th:text="${pageNumber}"></a>
+                <a class="page-link" th:case="false" href="#" aria-current="page" th:text="${pageNumber}"></a>
+            </li>
+            <li th:class="${'page-item ' + (currentPage.hasNext() ? '' : 'disabled')}">
+                <div th:switch="${currentPage.hasNext()}" th:remove="tag">
+                    <a class="page-link" th:case="true" th:href="${'?page=' + currentPage.nextPageable().pageNumber}">Next</a>
+                    <a class="page-link" th:case="false" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+</body>

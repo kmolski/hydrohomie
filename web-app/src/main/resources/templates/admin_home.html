@@ -47,28 +47,7 @@
             </tr>
             </tbody>
         </table>
-        <nav>
-            <ul class="pagination justify-content-end">
-                <li th:class="${'page-item ' + (userAccounts.hasPrevious() ? '' : 'disabled')}">
-                    <div th:switch="${userAccounts.hasPrevious()}" th:remove="tag">
-                        <a class="page-link" th:case="true" th:href="${'?page=' + userAccounts.previousPageable().pageNumber}">Previous</a>
-                        <a class="page-link" th:case="false" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                    </div>
-                </li>
-                <li th:class="${'page-item ' + (it.index == userAccounts.number ? 'active' : '')}"
-                    th:each="pageNumber, it : ${#numbers.sequence(1, userAccounts.totalPages)}"
-                    th:switch="${it.index != userAccounts.number}">
-                    <a class="page-link" th:case="true" th:href="${'?page=' + it.index}" th:text="${pageNumber}"></a>
-                    <a class="page-link" th:case="false" href="#" aria-current="page" th:text="${pageNumber}"></a>
-                </li>
-                <li th:class="${'page-item ' + (userAccounts.hasNext() ? '' : 'disabled')}">
-                    <div th:switch="${userAccounts.hasNext()}" th:remove="tag">
-                        <a class="page-link" th:case="true" th:href="${'?page=' + userAccounts.nextPageable().pageNumber}">Next</a>
-                        <a class="page-link" th:case="false" href="#" tabindex="-1" aria-disabled="true">Next</a>
-                    </div>
-                </li>
-            </ul>
-        </nav>
+        <nav th:replace="pagination::pagination(${userAccounts})"></nav>
     </div>
 </body>
 </html>
