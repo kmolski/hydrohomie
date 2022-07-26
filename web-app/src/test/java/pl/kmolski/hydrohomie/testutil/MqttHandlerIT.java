@@ -1,5 +1,6 @@
 package pl.kmolski.hydrohomie.testutil;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -57,6 +58,11 @@ public abstract class MqttHandlerIT extends WebFluxControllerIT {
         try {
             mqttTestClient.close();
         } catch (MqttException ignored) {}
+    }
+
+    protected void sendMqttMessage(String topic, Object message) throws JsonProcessingException, MqttException {
+        var messageBytes = objectMapper.writeValueAsBytes(message);
+        mqttTestClient.publish(topic, messageBytes, 0, false);
     }
 
     protected void assertMqttMessagesInOrder(String topic, IMqttMessageListener... assertions) throws InterruptedException, MqttException {

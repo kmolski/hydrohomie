@@ -16,8 +16,8 @@ import static pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.*;
 @JsonTypeInfo(use = NAME, property = "type")
 @JsonSubTypes({
         @Type(value = ConnectedMessage.class, name = "connected"),
-        @Type(value = HeartbeatMessage.class, name = "heartbeat"),
         @Type(value = ListeningMessage.class, name = "listening"),
+        @Type(value = HeartbeatMessage.class, name = "heartbeat"),
         @Type(value = BeginMessage.class, name = "begin"),
         @Type(value = EndMessage.class, name = "end"),
         @Type(value = DiscardMessage.class, name = "discard")

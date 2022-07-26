@@ -44,8 +44,7 @@ class RootTopicHandlerIT extends MqttHandlerIT {
         expectedDevice.setTimezone(ZoneId.systemDefault());
 
         var connectedMessage = new CoasterMessage.ConnectedMessage(mockDeviceId);
-        var messageBytes = objectMapper.writeValueAsBytes(connectedMessage);
-        mqttTestClient.publish("hydrohomie", messageBytes, 0, false);
+        sendMqttMessage("hydrohomie", connectedMessage);
 
         assertMqttMessagesInOrder("hydrohomie/device/" + mockDeviceId, (topic, message) -> {
             var response = objectMapper.readValue(message.getPayload(), CoasterMessage.ListeningMessage.class);
@@ -75,8 +74,7 @@ class RootTopicHandlerIT extends MqttHandlerIT {
 
         when(clock.instant()).thenReturn(moment1);
         var connectedMessage = new CoasterMessage.ConnectedMessage(mockDeviceId);
-        var messageBytes = objectMapper.writeValueAsBytes(connectedMessage);
-        mqttTestClient.publish("hydrohomie", messageBytes, 0, false);
+        sendMqttMessage("hydrohomie", connectedMessage);
 
         assertMqttMessagesInOrder("hydrohomie/device/" + mockDeviceId, (topic, message) -> {
             var response = objectMapper.readValue(message.getPayload(), CoasterMessage.ListeningMessage.class);

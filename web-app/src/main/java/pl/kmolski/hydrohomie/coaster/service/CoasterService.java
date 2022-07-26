@@ -65,7 +65,7 @@ public class CoasterService {
 
     public Mono<Coaster> resetCoasterState(String deviceName, Instant now) {
         return findOrCreateCoasterEntity(deviceName, now)
-                .map(coaster -> coaster.setInitLoad(null))
+                .map(coaster -> coaster.setInitLoad(null).setInactiveSince(now))
                 .flatMap(coasterRepository::save);
     }
 
