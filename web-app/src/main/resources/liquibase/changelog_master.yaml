@@ -22,3 +22,101 @@ databaseChangeLog:
                   defaultValue: true
                   constraints:
                     nullable: false
+  - changeSet:
+      id: 2_add_coasters
+      author: kmolski
+      changes:
+        - createTable:
+            tableName: coasters
+            columns:
+              - column:
+                  name: device_name
+                  type: varchar(127)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: display_name
+                  type: varchar(127)
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: coasters_display_name_unique
+              - column:
+                  name: description
+                  type: varchar(511)
+              - column:
+                  name: timezone
+                  type: varchar(63)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: place
+                  type: varchar(127)
+              - column:
+                  name: owner
+                  type: varchar(63)
+              - column:
+                  name: init_load
+                  type: real
+                  defaultValue: null
+              - column:
+                  name: inactive_since
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: coasters
+            columns:
+              - column:
+                  name: owner
+            indexName: coasters_owner_index
+        - addForeignKeyConstraint:
+            constraintName: coasters_user_data_username_fk
+            baseTableName: coasters
+            baseColumnNames: owner
+            referencedTableName: user_data
+            referencedColumnNames: username
+            onUpdate: cascade
+            onDelete: set null
+  - changeSet:
+      id: 3_add_measurements
+      author: kmolski
+      changes:
+        - createTable:
+            tableName: measurements
+            columns:
+              - column:
+                  name: id
+                  type: int generated always as identity
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: device_name
+                  type: varchar(127)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: volume
+                  type: real
+                  constraints:
+                    nullable: false
+              - column:
+                  name: timestamp
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: measurements
+            columns:
+              - column:
+                  name: device_name
+              - column:
+                  name: timestamp
+            indexName: measurements_device_time_index
+        - addForeignKeyConstraint:
+            constraintName: measurements_coasters_device_name_fk
+            baseTableName: measurements
+            baseColumnNames: device_name
+            referencedTableName: coasters
+            referencedColumnNames: device_name
+            onUpdate: cascade
+            onDelete: cascade
