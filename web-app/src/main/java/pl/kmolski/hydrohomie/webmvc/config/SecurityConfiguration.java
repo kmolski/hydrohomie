@@ -18,6 +18,12 @@ import pl.kmolski.hydrohomie.account.model.AccountRole;
 @EnableWebFluxSecurity
 public class SecurityConfiguration {
 
+    private static final int SALT_LENGTH = 16;
+    private static final int HASH_LENGTH = 32;
+    private static final int PARALLELISM = 1;
+    private static final int MEMORY = 1 << 14;
+    private static final int ITERATIONS = 4;
+
     /**
      * Configure the Argon2id password encoder, as recommended by the
      * <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP Cheat Sheet</a>
@@ -26,7 +32,7 @@ public class SecurityConfiguration {
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new Argon2PasswordEncoder();
+        return new Argon2PasswordEncoder(SALT_LENGTH, HASH_LENGTH, PARALLELISM, MEMORY, ITERATIONS);
     }
 
     /**

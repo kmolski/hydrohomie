@@ -47,7 +47,7 @@ class DeviceTopicHandlerIT extends MqttHandlerIT {
         coasterRepository.findById(mockDeviceId).map(coaster -> {
             assertEquals(moment2.minusSeconds(inactiveSeconds), coaster.getInactiveSince(), "Inactive since differs");
             return coaster;
-        }).retryWhen(Retry.backoff(5, Duration.ofSeconds(1))).block();
+        }).retryWhen(Retry.backoff(5, Duration.ofMillis(100))).block();
     }
 
     @Test
@@ -68,7 +68,7 @@ class DeviceTopicHandlerIT extends MqttHandlerIT {
             assertEquals(initLoad, coaster.getInitLoad(), "Initial load differs");
             assertEquals(moment2, coaster.getInactiveSince(), "Inactive since differs");
             return coaster;
-        }).retryWhen(Retry.backoff(5, Duration.ofSeconds(1))).block();
+        }).retryWhen(Retry.backoff(5, Duration.ofMillis(100))).block();
     }
 
     @Test
@@ -91,12 +91,14 @@ class DeviceTopicHandlerIT extends MqttHandlerIT {
             assertNull(coaster.getInitLoad(), "Initial load is not null");
             assertEquals(moment2, coaster.getInactiveSince(), "Inactive since differs");
             return coaster;
-        }).retryWhen(Retry.backoff(5, Duration.ofSeconds(1))).block();
+        }).retryWhen(Retry.backoff(5, Duration.ofMillis(100))).block();
 
         var actual = measurementRepository
                 .findByDeviceNameAndTimestampBetween(mockDeviceId, moment1, moment2)
                 .collectList().block();
         assertEquals(1, actual.size(), "Unexpected measurements for coaster");
+        assertNotNull(actual.get(0).id(), "Measurement ID is null");
+        assertNotNull(actual.get(0).deviceName(), "Device name is null");
         assertEquals(moment2, actual.get(0).timestamp(), "Measurement timestamp differs");
         assertEquals(volume, actual.get(0).volume(), "Measurement volume differs");
     }
@@ -120,6 +122,6 @@ class DeviceTopicHandlerIT extends MqttHandlerIT {
             assertNull(coaster.getInitLoad(), "Initial load is not null");
             assertEquals(moment2, coaster.getInactiveSince(), "Inactive since differs");
             return coaster;
-        }).retryWhen(Retry.backoff(5, Duration.ofSeconds(1))).block();
+        }).retryWhen(Retry.backoff(5, Duration.ofMillis(100))).block();
     }
 }
