@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/ionicons/css/ionicons.min.css}"/>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
     <title>Coasters - hydrohomie</title>
@@ -26,10 +27,21 @@
                         <p th:text="${'Timezone: ' + coaster.timezone}" class="m-0"/>
                         <p th:if="${coaster.place}" th:text="${'Place: ' + coaster.place}" class="m-0"/>
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer d-flex justify-content-between align-items-center">
                         <small th:text="${'Last active on ' +
                                    #temporals.format(coaster.inactiveSince.atZone(coaster.timezone), 'yyyy-MM-dd')}"
                                class="text-muted"/>
+                        <div class="btn-group" role="group" aria-label="Operations">
+                            <a th:href="@{/user/coaster/{id}(id=${coaster.deviceName})}" class="btn btn-primary py-1 px-2">
+                                <span class="ion ion-eye"></span>
+                            </a>
+                            <a th:href="@{/user/editCoaster/{id}(id=${coaster.deviceName})}" class="btn btn-secondary py-1 px-2">
+                                <span class="ion ion-settings"></span>
+                            </a>
+                            <a th:href="@{/user/unassignCoaster/{id}(id=${coaster.deviceName})}" class="btn btn-danger py-1 px-2">
+                                <span class="ion ion-trash-a"></span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

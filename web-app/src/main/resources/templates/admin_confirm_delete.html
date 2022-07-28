@@ -15,10 +15,10 @@
     <div class="container my-4">
         <h3 class="mb-3" th:text="${'Delete user ' + username + '?'}"></h3>
         <div class="d-flex">
-            <a th:href="@{/admin}" class="btn btn-secondary">Go back</a>
             <form th:action="@{/admin/deleteUser/{id}(id=${username})}" method="post">
-                <input class="btn btn-danger ms-2" type="submit" value="Delete"/>
+                <input class="btn btn-danger" type="submit" value="Delete"/>
             </form>
+            <a th:href="@{/admin}" class="btn btn-secondary ms-2">Go back</a>
         </div>
     </div>
 </body>

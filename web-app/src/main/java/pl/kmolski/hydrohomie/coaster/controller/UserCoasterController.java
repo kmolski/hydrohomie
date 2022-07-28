@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import pl.kmolski.hydrohomie.coaster.model.Measurement;
 import pl.kmolski.hydrohomie.coaster.repo.MeasurementRepository;
-import pl.kmolski.hydrohomie.coaster.service.CoasterService;
+import pl.kmolski.hydrohomie.coaster.service.CoasterManagementService;
 import pl.kmolski.hydrohomie.webmvc.util.PaginationUtil;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserCoasterController {
 
-    private final CoasterService coasterService;
+    private final CoasterManagementService coasterService;
     private final MeasurementRepository measurementRepository;
     private final Clock clock;
 
