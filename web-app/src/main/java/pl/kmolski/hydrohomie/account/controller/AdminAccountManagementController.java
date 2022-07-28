@@ -144,6 +144,19 @@ public class AdminAccountManagementController {
     }
 
     /**
+     * Show the user delete confirmation view.
+     *
+     * @param username the name of the user to delete
+     * @param model the template model
+     * @return the confirmation page
+     */
+    @GetMapping("/deleteUser/{id}")
+    public String deleteUserConfirm(@PathVariable("id") String username, Model model) {
+        model.addAttribute("username", username);
+        return "admin_confirm_delete";
+    }
+
+    /**
      * Delete the user specified in the path variable 'id'.
      *
      * @param username the name of the user to delete

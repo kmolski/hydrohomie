@@ -43,6 +43,8 @@ class AdminAccountManagementControllerTest extends WebFluxControllerTest {
                 .expectStatus().isForbidden();
         webTestClient.get().uri("/admin/changePassword/foo").exchange()
                 .expectStatus().isForbidden();
+        webTestClient.get().uri("/admin/deleteUser/foo").exchange()
+                .expectStatus().isForbidden();
 
         webTestClient.post().uri("/admin/createUser").exchange()
                 .expectStatus().isForbidden();
@@ -64,6 +66,9 @@ class AdminAccountManagementControllerTest extends WebFluxControllerTest {
                 .expectStatus().is3xxRedirection()
                 .expectHeader().location("/login");
         webTestClient.get().uri("/admin/changePassword/foo").exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/login");
+        webTestClient.get().uri("/admin/deleteUser/foo").exchange()
                 .expectStatus().is3xxRedirection()
                 .expectHeader().location("/login");
 
@@ -254,6 +259,11 @@ class AdminAccountManagementControllerTest extends WebFluxControllerTest {
         webTestClient.mutateWith(csrf()).post().uri("/admin/setEnabledUser/" + username + "?enabled=false")
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    @Test
+    void deleteUserConfirmationIsAccessibleByAdmin() {
+        webTestClient.get().uri("/admin/deleteUser/foo").exchange().expectStatus().isOk();
     }
 
     @Test

@@ -40,9 +40,7 @@
                         <input th:case="false" class="btn btn-success ms-2" type="submit" value="Enable"/>
                     </form>
                     <a th:href="@{/admin/changePassword/{id}(id=${user.username})}" class="btn btn-primary ms-2">Change password</a>
-                    <form th:action="@{/admin/deleteUser/{id}(id=${user.username})}" method="post">
-                        <input class="btn btn-danger ms-2" type="submit" value="Delete"/>
-                    </form>
+                    <a th:href="@{/admin/deleteUser/{id}(id=${user.username})}" class="btn btn-danger ms-2">Delete</a>
                 </td>
             </tr>
             </tbody>
