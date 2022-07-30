@@ -9,16 +9,21 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
+import pl.kmolski.hydrohomie.coaster.service.CoasterService;
 import pl.kmolski.hydrohomie.mqtt.config.MqttClientSettings;
 import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.ConnectedMessage;
 import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.ListeningMessage;
-import pl.kmolski.hydrohomie.coaster.service.CoasterService;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Map;
 
 import static pl.kmolski.hydrohomie.mqtt.config.MqttConfiguration.DEVICE_SUBTOPIC;
 
+/**
+ * MQTT message handler for {@link ConnectedMessage} on the root topic.
+ * Responds with {@link ListeningMessage} payloads on the device topic.
+ */
 @Component
 @RequiredArgsConstructor
 public class RootTopicHandler implements GenericHandler<ConnectedMessage> {
@@ -28,6 +33,16 @@ public class RootTopicHandler implements GenericHandler<ConnectedMessage> {
     private final CoasterService coasterService;
     private final MqttClientSettings mqttClientSettings;
     private final Clock clock;
+
+    private Message<ListeningMessage> wrapInMqttResponse(ListeningMessage message, Map<String, ?> headers) {
+        var responseTopic = mqttClientSettings.topic() + DEVICE_SUBTOPIC + message.device();
+        LOGGER.info("Sending to device topic '{}': {}", responseTopic, message);
+
+        return MessageBuilder.withPayload(message)
+                .copyHeaders(headers)
+                .setHeader(MqttHeaders.TOPIC, responseTopic)
+                .build();
+    }
 
     @Override
     public Message<ListeningMessage> handle(ConnectedMessage message, MessageHeaders headers) {
@@ -39,15 +54,7 @@ public class RootTopicHandler implements GenericHandler<ConnectedMessage> {
                     float initTotal = coasterAndTotal.getT2();
                     return new ListeningMessage(coaster.getDeviceName(), coaster.getInitLoad(), initTotal);
                 })
-                .map(response -> {
-                    var responseTopic = mqttClientSettings.topic() + DEVICE_SUBTOPIC + response.device();
-                    LOGGER.info("Sending to device topic '{}': {}", responseTopic, response);
-
-                    return MessageBuilder.withPayload(response)
-                            .copyHeaders(headers)
-                            .setHeader(MqttHeaders.TOPIC, responseTopic)
-                            .build();
-                })
+                .map(listeningMessage -> wrapInMqttResponse(listeningMessage, headers))
                 .block();
     }
 }

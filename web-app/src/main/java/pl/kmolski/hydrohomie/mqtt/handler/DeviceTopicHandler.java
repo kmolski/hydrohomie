@@ -7,12 +7,16 @@ import org.springframework.integration.handler.GenericHandler;
 import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
-import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.*;
 import pl.kmolski.hydrohomie.coaster.service.CoasterService;
+import pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.IncomingDeviceTopicMessage;
 
 import java.time.Clock;
 import java.time.Instant;
 
+/**
+ * MQTT message handler for {@link IncomingDeviceTopicMessage} on the device topic.
+ * No responses are generated for the incoming messages.
+ */
 @Component
 @RequiredArgsConstructor
 public class DeviceTopicHandler implements GenericHandler<IncomingDeviceTopicMessage> {
