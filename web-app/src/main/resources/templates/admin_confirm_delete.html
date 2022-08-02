@@ -13,7 +13,7 @@
     <nav th:replace="admin_navbar::navbar('confirm')"></nav>
 
     <div class="container my-4">
-        <h3 class="mb-3" th:text="${'Delete user ' + username + '?'}"></h3>
+        <h3 class="mb-3" th:text="${'Delete user ''' + username + '''?'}"></h3>
         <div class="d-flex">
             <form th:action="@{/admin/deleteUser/{id}(id=${username})}" method="post">
                 <input class="btn btn-danger" type="submit" value="Delete"/>

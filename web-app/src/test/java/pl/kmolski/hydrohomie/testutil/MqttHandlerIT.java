@@ -29,8 +29,7 @@ public abstract class MqttHandlerIT extends WebFluxControllerIT {
             .withExposedPorts(1883);
 
     @Autowired
-    // TODO: drop visibility
-    protected MqttPahoClientFactory mqttPahoClientFactory;
+    private MqttPahoClientFactory mqttPahoClientFactory;
 
     protected IMqttClient mqttTestClient;
 
@@ -70,7 +69,8 @@ public abstract class MqttHandlerIT extends WebFluxControllerIT {
         var latch = new CountDownLatch(assertions.length);
         mqttTestClient.subscribe(topic, (t, msg) -> {
             try {
-                assertions[(int) (assertions.length - latch.getCount())].messageArrived(t, msg);
+                int currentAssertion = (int) (assertions.length - latch.getCount());
+                assertions[currentAssertion].messageArrived(t, msg);
                 latch.countDown();
             } catch (Exception e) {
                 exceptions.add(e);

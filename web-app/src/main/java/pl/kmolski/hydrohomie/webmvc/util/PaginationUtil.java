@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 /**
  * Utilities related to pagination in the web UI.
  */
-public class PaginationUtil {
+public final class PaginationUtil {
 
     /**
      * The default page size.
