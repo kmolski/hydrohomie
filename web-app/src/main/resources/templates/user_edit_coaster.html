@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>Edit coaster details - hydrohomie</title>
+</head>
+<body>
+    <nav th:replace="user_navbar::navbar"></nav>
+
+    <div class="container my-4 col-sm-6 col-sm-offset-3">
+        <h3 class="mb-4">Edit coaster details</h3>
+        <!--/*@thymesVar id="updateCoasterDetailsDto" type="pl.kmolski.hydrohomie.coaster.dto.UpdateCoasterDetailsDto"*/-->
+        <form th:action="@{/user/editCoaster/{id}(id=${deviceName})}" th:object="${updateCoasterDetailsDto}"
+              id="edit_coaster" name="edit_coaster" method="post">
+            <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger">
+                <ul class="mb-0">
+                    <li th:each="err : ${#fields.allErrors()}" th:text="${err}"/>
+                </ul>
+            </div>
+            <div class="mb-3">
+                <label for="displayName" class="form-label">Display name:</label>
+                <input type="text" class="form-control" th:field="*{displayName}" id="displayName" maxlength="127">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label>
+                <textarea class="form-control" th:field="*{description}" id="description" maxlength="511"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="timezone" class="form-label">Timezone:</label>
+                <select class="form-select" id="timezone" name="timezone">
+                    <option th:each="tz : ${T(java.time.ZoneId).getAvailableZoneIds().stream().sorted().toList()}"
+                            th:value="${tz}" th:text="${tz}" th:selected="${tz == '__*{timezone}__'}"></option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="place" class="form-label">Place:</label>
+                <input type="text" class="form-control" th:field="*{place}" id="place" maxlength="127">
+            </div>
+            <input type="submit" class="btn btn-primary" value="Submit">
+            <a th:href="@{/user}" class="btn btn-secondary">Go back</a>
+        </form>
+    </div>
+</body>
+</html>

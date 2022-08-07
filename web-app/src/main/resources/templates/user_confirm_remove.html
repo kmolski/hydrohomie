@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>Confirm - hydrohomie</title>
+</head>
+<body>
+    <nav th:replace="user_navbar::navbar"></nav>
+
+    <div class="container my-4">
+        <h3 class="mb-3" th:text="${'Remove coaster ''' + deviceName + ''' from your account?'}"></h3>
+        <div class="d-flex">
+            <form th:action="@{/user/removeCoaster/{id}(id=${deviceName})}" method="post">
+                <input class="btn btn-danger" type="submit" value="Remove"/>
+            </form>
+            <a th:href="@{/user}" class="btn btn-secondary ms-2">Go back</a>
+        </div>
+    </div>
+</body>
+</html>

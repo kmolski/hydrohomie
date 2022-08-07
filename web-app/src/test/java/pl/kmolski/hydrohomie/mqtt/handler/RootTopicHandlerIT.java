@@ -39,9 +39,7 @@ class RootTopicHandlerIT extends MqttHandlerIT {
         var moment1 = Instant.ofEpochSecond(1);
         when(clock.instant()).thenReturn(moment1);
 
-        var expectedDevice = new Coaster(mockDeviceId);
-        expectedDevice.setInactiveSince(moment1);
-        expectedDevice.setTimezone(ZoneId.systemDefault());
+        var expectedDevice = new Coaster(mockDeviceId).setInactiveSince(moment1).setTimezone(ZoneId.systemDefault());
 
         var connectedMessage = new CoasterMessage.ConnectedMessage(mockDeviceId);
         sendMqttMessage("hydrohomie", connectedMessage);

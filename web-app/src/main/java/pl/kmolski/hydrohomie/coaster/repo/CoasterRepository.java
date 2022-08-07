@@ -23,6 +23,8 @@ public interface CoasterRepository extends ReactiveCrudRepository<Coaster, Strin
 
     Mono<Long> countByOwner(String owner);
 
+    Mono<Coaster> findByDeviceNameAndOwner(String deviceName, String owner);
+
     @NonNull
     @Query("""
         insert into coasters (device_name, inactive_since, timezone)

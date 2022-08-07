@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/ionicons/css/ionicons.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <title>View coaster - hydrohomie</title>
+</head>
+<body>
+    <nav th:replace="user_navbar::navbar"></nav>
+
+    <div class="container my-4">
+        <h3 th:text="${'Details of ''' + (coaster.displayName ?: coaster.deviceName) + ''''}"></h3>
+    </div>
+</body>
+</html>

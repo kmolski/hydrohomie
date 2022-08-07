@@ -25,7 +25,7 @@ public class CoasterService {
     private final CoasterRepository coasterRepository;
     private final MeasurementRepository measurementRepository;
 
-    public Mono<Coaster> findOrCreateCoasterEntity(String deviceName, Instant now) {
+    private Mono<Coaster> findOrCreateCoasterEntity(String deviceName, Instant now) {
         return coasterRepository.findById(deviceName)
                 .switchIfEmpty(coasterRepository.create(deviceName, now, ZoneId.systemDefault()));
     }
