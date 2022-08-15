@@ -25,8 +25,13 @@ public class CoasterManagementService {
 
     private final CoasterRepository coasterRepository;
 
+    private Mono<Coaster> findCoasterOrFail(String deviceName, String owner) {
+        return coasterRepository.findByDeviceNameAndOwner(deviceName, owner)
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Coaster not found")));
+    }
+
     private Mono<Coaster> updateCoasterOwner(String deviceName, String prevOwner, String newOwner) {
-        return coasterRepository.findByDeviceNameAndOwner(deviceName, prevOwner)
+        return findCoasterOrFail(deviceName, prevOwner)
                 .map(coaster -> coaster.setOwner(newOwner))
                 .flatMap(coasterRepository::save);
     }
@@ -45,7 +50,6 @@ public class CoasterManagementService {
         return updateCoasterOwner(deviceName, null, username)
                 .doOnNext(coaster -> LOGGER.info("Successfully assigned coaster '{}' to user={}",
                         coaster.getDeviceName(), username))
-                .switchIfEmpty(Mono.error(new EntityNotFoundException("Coaster not found")))
                 .onErrorResume(
                         DataIntegrityViolationException.class,
                         exc -> Mono.error(new EntityNotFoundException("User not found")));
@@ -62,30 +66,27 @@ public class CoasterManagementService {
 
     @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
     public Mono<Coaster> getCoasterDetails(String deviceName, String username) {
-        return coasterRepository.findByDeviceNameAndOwner(deviceName, username)
+        return findCoasterOrFail(deviceName, username)
                 .doOnNext(coaster -> LOGGER.info("Found coaster '{}' of user={}",
-                        coaster.getDeviceName(), username))
-                .switchIfEmpty(Mono.error(new EntityNotFoundException("Coaster not found")));
+                        coaster.getDeviceName(), username));
     }
 
     @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
     public Mono<Coaster> updateCoasterDetails(String deviceName, String username, UpdateCoasterDetailsDto detailsDto) {
-        return coasterRepository.findByDeviceNameAndOwner(deviceName, username)
+        return findCoasterOrFail(deviceName, username)
                 .map(coaster -> coaster.setDisplayName(detailsDto.getDisplayName())
                                        .setDescription(detailsDto.getDescription())
                                        .setTimezone(detailsDto.getTimezone())
                                        .setPlace(detailsDto.getPlace()))
                 .flatMap(coasterRepository::save)
                 .doOnNext(coaster -> LOGGER.info("Successfully updated coaster '{}' of user={}",
-                        coaster.getDeviceName(), username))
-                .switchIfEmpty(Mono.error(new EntityNotFoundException("Coaster not found")));
+                        coaster.getDeviceName(), username));
     }
 
     @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
     public Mono<Coaster> removeCoasterFromUser(String deviceName, String username) {
         return updateCoasterOwner(deviceName, username, null)
                 .doOnNext(coaster -> LOGGER.info("Successfully removed coaster '{}' of user={}",
-                        coaster.getDeviceName(), username))
-                .switchIfEmpty(Mono.error(new EntityNotFoundException("Coaster not found")));
+                        coaster.getDeviceName(), username));
     }
 }

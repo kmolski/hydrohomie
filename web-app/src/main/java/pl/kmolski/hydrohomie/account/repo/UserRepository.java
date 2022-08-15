@@ -3,7 +3,6 @@ package pl.kmolski.hydrohomie.account.repo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 import pl.kmolski.hydrohomie.account.model.UserAccount;
@@ -41,9 +40,8 @@ public interface UserRepository extends ReactiveCrudRepository<UserAccount, Stri
      * @return the new user's account
      * @param <S> the user account type
      */
-    @NonNull
     @Query("""
         insert into user_data (username, password, enabled)
         values (:username, :password, :enabled) returning *""")
-    <S extends UserAccount> Mono<S> create(@NonNull String username, @NonNull String password, boolean enabled);
+    <S extends UserAccount> Mono<S> create(String username, String password, boolean enabled);
 }

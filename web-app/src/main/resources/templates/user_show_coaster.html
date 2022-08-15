@@ -7,6 +7,128 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/ionicons/css/ionicons.min.css}"/>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/momentjs/moment.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/chartjs/Chart.js}"></script>
+
+    <script type="text/javascript">
+        const updateInterval = 10000;
+        const fetchJson = (url) => fetch(url).then(response => response.json());
+
+        const populateMeasurementsTable = () => {
+            const latestMeasurementsTable = document.getElementById("lmTable");
+            const latestMeasurementsBody = document.getElementById("lmTbody");
+
+            fetchJson(location.href + '/latestMeasurements')
+                .then((data) => {
+                    latestMeasurementsBody.innerHTML = "";
+
+                    data.forEach((measurement) => {
+                        const measurementRow = document.createElement("tr");
+                        const volumeCell = document.createElement("td");
+                        const timeCell = document.createElement("td");
+
+                        volumeCell.innerText = Number.parseFloat(measurement.volume)
+                            .toLocaleString(
+                                undefined, { maximumFractionDigits: 1 }
+                            ) + " ml";
+                        timeCell.innerText = new Date(measurement.timestamp).toLocaleString();
+
+                        measurementRow.appendChild(volumeCell);
+                        measurementRow.appendChild(timeCell);
+                        latestMeasurementsBody.appendChild(measurementRow);
+                    });
+
+                    latestMeasurementsTable.style.display = "block";
+                })
+                .then(() => setTimeout(populateMeasurementsTable, updateInterval));
+        };
+
+        const createTimeInterval = (timeScale) => {
+            const endDate = new Date();
+            const startDate = new Date(endDate);
+            const grouping = {
+                "24HR": (t) => (t.setDate(t.getDate() - 1), "HOURS"),
+                "WEEK": (t) => (t.setDate(t.getDate() - 7), "DAYS"),
+                "MONTH": (t) => (t.setMonth(t.getMonth() - 1), "DAYS"),
+                "YEAR": (t) => (t.setFullYear(t.getFullYear() - 1), "MONTHS")
+            }[timeScale](startDate);
+            return { startDate, endDate, grouping };
+        };
+
+        function getGroupingAndLocation(timeScale) {
+            const {startDate, endDate, grouping} = createTimeInterval(timeScale);
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            const requestLocation = new URL(location);
+            requestLocation.href += "/measurements";
+            requestLocation.search += `start=${startDate.setHours(0, 0, 0, 0)}`;
+            requestLocation.search += `&end=${endDate.setHours(23, 59, 59, 999)}`;
+            requestLocation.search += `&unit=${grouping}&tz=${timezone}`;
+            return {grouping, requestLocation};
+        }
+
+        const updateChartOptions = (chart, grouping) => {
+            let options = chart.config.options.scales["xAxes"][0];
+            const unit = {
+                "HOURS": "hour",
+                "DAYS": "day",
+                "MONTHS": "month"
+            }[grouping];
+            options.time.round = unit;
+            options.time.unit = unit;
+        };
+
+        const splitMeasurements = (data) => {
+            const labels = [], values = [];
+            for (const measurement of data) {
+                labels.push(moment.utc(measurement.timestamp));
+                values.push(measurement.volume);
+            }
+            return { labels, values };
+        };
+
+        const populateStatisticsChart = (chart) => {
+            const timeScale = Array.from(document.getElementsByName("timeScale"))
+                .filter((element) => element.checked).shift().value;
+
+            const {grouping, requestLocation} = getGroupingAndLocation(timeScale);
+            fetchJson(requestLocation)
+                .then((data) => {
+                    updateChartOptions(chart, grouping);
+                    const { labels, values } = splitMeasurements(data);
+                    chart.data = {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            label: "volume of water [ml]"
+                        }]
+                    };
+                    chart.update({ duration: 0 });
+                })
+                .then(() => setTimeout(populateStatisticsChart, updateInterval, chart));
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const ctx = document.getElementById("statisticsChart").getContext("2d");
+            const config = {
+                type: "bar",
+                options: {
+                    scales: {
+                        xAxes: [{
+                            type: "time",
+                            time: {
+                                round: "day",
+                                unit: "day"
+                            }
+                        }]
+                    }
+                }
+            };
+
+            populateMeasurementsTable();
+            populateStatisticsChart(new Chart(ctx, config));
+        });
+    </script>
 
     <title>View coaster - hydrohomie</title>
 </head>
@@ -15,6 +137,62 @@
 
     <div class="container my-4">
         <h3 th:text="${'Details of ''' + (coaster.displayName ?: coaster.deviceName) + ''''}"></h3>
+        <div class="row">
+            <div class="col-sm-12 p-2">
+                <div class="card rounded rounded-3 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Statistics</h5>
+
+                        <canvas id="statisticsChart"></canvas>
+
+                        <fieldset class="d-flex flex-row flex-wrap align-items-center justify-content-end m-1">
+                            <div class="me-3">Show chart for the last: </div>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="timeScale" id="24hr" value="24HR" autocomplete="off">
+                                <label class="btn btn-primary" for="24hr">24 hours</label>
+                                <input type="radio" class="btn-check" name="timeScale" id="week" value="WEEK" autocomplete="off" checked>
+                                <label class="btn btn-primary" for="week">Week</label>
+                                <input type="radio" class="btn-check" name="timeScale" id="month" value="MONTH" autocomplete="off">
+                                <label class="btn btn-primary" for="month">Month</label>
+                                <input type="radio" class="btn-check" name="timeScale" id="year" value="YEAR" autocomplete="off">
+                                <label class="btn btn-primary" for="year">Year</label>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 p-2 m-0">
+                <div class="card rounded rounded-3 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Properties</h5>
+                        <p th:text="${'Timezone: ' + coaster.timezone}" class="m-0"/>
+                        <p th:if="${coaster.place}" th:text="${'Place: ' + coaster.place}" class="m-0"/>
+                        <p th:if="${coaster.inactiveSince}" th:text="${'Inactive since: ' +
+                                   #temporals.format(coaster.inactiveSince.atZone(coaster.timezone), 'yyyy-MM-dd')}" class="m-0"/>
+                        <div th:if="${coaster.description}" th:remove="tag">
+                            <p class="m-0 mt-2">Description:</p>
+                            <p th:text="${coaster.description}" class="m-0"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 p-2 m-0">
+                <div class="card rounded rounded-3 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Last 10 measurements</h5>
+                        <table id="lmTable" class="table table-hover" style="display: none;">
+                            <thead>
+                            <tr>
+                                <th scope="col">Volume</th>
+                                <th scope="col">Time</th>
+                            </tr>
+                            </thead>
+                            <tbody id="lmTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

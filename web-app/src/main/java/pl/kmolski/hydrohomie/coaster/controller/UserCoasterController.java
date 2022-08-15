@@ -1,10 +1,12 @@
 package pl.kmolski.hydrohomie.coaster.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import pl.kmolski.hydrohomie.coaster.dto.UpdateCoasterDetailsDto;
 import pl.kmolski.hydrohomie.coaster.model.Measurement;
@@ -17,6 +19,8 @@ import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 /**
@@ -30,6 +34,16 @@ public class UserCoasterController {
     private final CoasterManagementService coasterService;
     private final MeasurementRepository measurementRepository;
     private final Clock clock;
+
+    /**
+     * Set the WebDataBinder to trim strings and convert empty strings to null.
+     *
+     * @param binder the WebDataBinder instance to update
+     */
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+    }
 
     /**
      * Populate and show the assigned coaster list view.
@@ -145,12 +159,21 @@ public class UserCoasterController {
                 });
     }
 
-    @GetMapping("/coasterMeasurements/{id}")
+    @ResponseBody
+    @GetMapping(path = "/coaster/{id}/measurements", produces = "application/json")
     public Flux<Measurement> getMeasurements(@PathVariable("id") String deviceName,
                                              @RequestParam("start") Long startTime,
-                                             @RequestParam(value = "end", required = false) Optional<Long> endTime) {
-        var start = Instant.ofEpochSecond(startTime);
-        var end = endTime.map(Instant::ofEpochSecond).orElseGet(() -> Instant.now(clock));
-        return measurementRepository.findByDeviceNameAndTimestampBetween(deviceName, start, end);
+                                             @RequestParam(value = "end", required = false) Optional<Long> endTime,
+                                             @RequestParam("unit") ChronoUnit unit,
+                                             @RequestParam("tz") ZoneId tz) {
+        var start = Instant.ofEpochMilli(startTime);
+        var end = endTime.map(Instant::ofEpochMilli).orElseGet(() -> Instant.now(clock));
+        return measurementRepository.findByDeviceNameAndIntervalGrouped(deviceName, start, end, unit, tz);
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/coaster/{id}/latestMeasurements", produces = "application/json")
+    public Flux<Measurement> getLatestMeasurements(@PathVariable("id") String deviceName) {
+        return measurementRepository.findTop10ByDeviceNameOrderByTimestampDesc(deviceName);
     }
 }

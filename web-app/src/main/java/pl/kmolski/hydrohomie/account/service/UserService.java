@@ -33,6 +33,11 @@ public class UserService implements ReactiveUserDetailsService {
     private final UserRepository userRepository;
     private final AdminAccount adminAccount;
 
+    private Mono<UserAccount> findUserOrFail(String username) {
+        return userRepository.findById(username)
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("User not found")));
+    }
+
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         LOGGER.debug("Fetching UserDetails for username={}", username);
@@ -88,11 +93,10 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<UserAccount> updatePassword(String username, PlaintextPassword password) {
         LOGGER.info("Updating password for user '{}'", username);
         var encodedPassword = passwordEncoder.encode(password.plaintext());
-        return userRepository.findById(username)
+        return findUserOrFail(username)
                 .map(entity -> entity.setPassword(encodedPassword))
                 .flatMap(userRepository::save)
-                .doOnNext(account -> LOGGER.info("Successfully updated password for user '{}'", account.getUsername()))
-                .switchIfEmpty(Mono.error(new EntityNotFoundException("User not found")));
+                .doOnNext(account -> LOGGER.info("Successfully updated password for user '{}'", account.getUsername()));
     }
 
     /**
@@ -105,12 +109,11 @@ public class UserService implements ReactiveUserDetailsService {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<UserAccount> setAccountEnabled(String username, boolean enabled) {
         LOGGER.info("Setting user '{}' to enabled={}", username, enabled);
-        return userRepository.findById(username)
+        return findUserOrFail(username)
                 .map(entity -> entity.setEnabled(enabled))
                 .flatMap(userRepository::save)
                 .doOnNext(account -> LOGGER.info("Successfully set user '{}' to enabled={}",
-                                account.getUsername(), account.isEnabled()))
-                .switchIfEmpty(Mono.error(new EntityNotFoundException("User not found")));
+                                account.getUsername(), account.isEnabled()));
     }
 
     /**
@@ -122,9 +125,8 @@ public class UserService implements ReactiveUserDetailsService {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<UserAccount> deleteAccount(String username) {
         LOGGER.info("Deleting account for user '{}'", username);
-        return userRepository.findById(username)
+        return findUserOrFail(username)
                 .flatMap(entity -> userRepository.delete(entity).thenReturn(entity))
-                .doOnNext(account -> LOGGER.info("Successfully deleted user '{}'", account.getUsername()))
-                .switchIfEmpty(Mono.error(new EntityNotFoundException("User not found")));
+                .doOnNext(account -> LOGGER.info("Successfully deleted user '{}'", account.getUsername()));
     }
 }
