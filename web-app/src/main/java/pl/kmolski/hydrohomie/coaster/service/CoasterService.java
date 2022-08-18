@@ -3,17 +3,20 @@ package pl.kmolski.hydrohomie.coaster.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.kmolski.hydrohomie.coaster.model.Coaster;
 import pl.kmolski.hydrohomie.coaster.model.Measurement;
 import pl.kmolski.hydrohomie.coaster.repo.CoasterRepository;
 import pl.kmolski.hydrohomie.coaster.repo.MeasurementRepository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Transactional
@@ -61,5 +64,18 @@ public class CoasterService {
         return findOrCreateCoasterEntity(deviceName, now)
                 .map(coaster -> coaster.setInitLoad(null).setInactiveSince(now))
                 .flatMap(coasterRepository::save);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
+    public Flux<Measurement> getMeasurementsByIntervalGrouped(String deviceName, String username, Instant start,
+                                                              Instant end, ChronoUnit timeUnit, ZoneId timezone) {
+        LOGGER.debug("Fetching grouped measurements for coaster '{}'", deviceName);
+        return measurementRepository.findByDeviceNameAndOwnerAndIntervalGrouped(deviceName, username, start, end, timeUnit, timezone);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
+    public Flux<Measurement> getLatestMeasurements(String deviceName, String username) {
+        LOGGER.debug("Fetching latest measurements for coaster '{}'", deviceName);
+        return measurementRepository.findTop10LatestByDeviceNameAndOwner(deviceName, username);
     }
 }

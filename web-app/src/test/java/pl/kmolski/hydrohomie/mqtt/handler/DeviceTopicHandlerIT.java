@@ -74,28 +74,29 @@ class DeviceTopicHandlerIT extends MqttHandlerIT {
     @Test
     void handleEndInsertsMeasurementAndUpdatesInitLoad() throws MqttException, JsonProcessingException {
         var moment1 = Instant.ofEpochSecond(1);
-        var mockDeviceId = "coaster102";
-        var mockDevice = coasterRepository.create(mockDeviceId, moment1, ZoneId.of("Etc/UTC")).block();
+        var deviceId = "coaster102";
+        var mockDevice = coasterRepository.create(deviceId, moment1, ZoneId.of("Etc/UTC")).block();
         assertNotNull(mockDevice, "Could not create mock coaster");
 
-        coasterRepository.findById(mockDeviceId).map(coaster -> coaster.setInitLoad(0.42f)).block();
+        coasterRepository.findById(deviceId)
+                .map(coaster -> coaster.setInitLoad(0.42f))
+                .flatMap(coasterRepository::save)
+                .block();
 
         var moment2 = Instant.ofEpochSecond(2);
         when(clock.instant()).thenReturn(moment2);
 
         var volume = 42.0f;
-        var end = new CoasterMessage.EndMessage(mockDeviceId, volume);
-        sendMqttMessage("hydrohomie/device/" + mockDeviceId, end);
+        var end = new CoasterMessage.EndMessage(deviceId, volume);
+        sendMqttMessage("hydrohomie/device/" + deviceId, end);
 
-        coasterRepository.findById(mockDeviceId).map(coaster -> {
+        coasterRepository.findById(deviceId).map(coaster -> {
             assertNull(coaster.getInitLoad(), "Initial load is not null");
             assertEquals(moment2, coaster.getInactiveSince(), "Inactive since differs");
             return coaster;
         }).retryWhen(Retry.backoff(5, Duration.ofMillis(100))).block();
 
-        var actual = measurementRepository
-                .findByDeviceNameAndTimestampBetween(mockDeviceId, moment1, moment2)
-                .collectList().block();
+        var actual = measurementRepository.findAllByDeviceName(deviceId).collectList().block();
         assertEquals(1, actual.size(), "Unexpected measurements for coaster");
         assertNotNull(actual.get(0).id(), "Measurement ID is null");
         assertNotNull(actual.get(0).deviceName(), "Device name is null");

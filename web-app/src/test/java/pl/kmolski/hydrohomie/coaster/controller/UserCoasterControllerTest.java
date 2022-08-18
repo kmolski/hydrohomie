@@ -7,8 +7,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import pl.kmolski.hydrohomie.coaster.model.Coaster;
-import pl.kmolski.hydrohomie.coaster.repo.MeasurementRepository;
 import pl.kmolski.hydrohomie.coaster.service.CoasterManagementService;
+import pl.kmolski.hydrohomie.coaster.service.CoasterService;
 import pl.kmolski.hydrohomie.testutil.WebFluxControllerTest;
 import pl.kmolski.hydrohomie.webmvc.exception.EntityNotFoundException;
 import reactor.core.publisher.Mono;
@@ -30,10 +30,10 @@ import static org.springframework.web.reactive.function.BodyInserters.fromFormDa
 class UserCoasterControllerTest extends WebFluxControllerTest {
 
     @MockBean
-    private CoasterManagementService coasterService;
+    private CoasterService coasterService;
 
     @MockBean
-    private MeasurementRepository measurementRepository;
+    private CoasterManagementService coasterManagementService;
 
     @MockBean
     private Clock clock;
@@ -48,6 +48,10 @@ class UserCoasterControllerTest extends WebFluxControllerTest {
         webTestClient.get().uri("/user/editCoaster/foo").exchange()
                 .expectStatus().isForbidden();
         webTestClient.get().uri("/user/removeCoaster/foo").exchange()
+                .expectStatus().isForbidden();
+        webTestClient.get().uri("/user/coaster/foo/measurements").exchange()
+                .expectStatus().isForbidden();
+        webTestClient.get().uri("/user/coaster/foo/latestMeasurements").exchange()
                 .expectStatus().isForbidden();
 
         webTestClient.post().uri("/user/editCoaster/foo").exchange()
@@ -71,6 +75,12 @@ class UserCoasterControllerTest extends WebFluxControllerTest {
         webTestClient.get().uri("/user/removeCoaster/foo").exchange()
                 .expectStatus().is3xxRedirection()
                 .expectHeader().location("/login");
+        webTestClient.get().uri("/user/coaster/foo/measurements").exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/login");
+        webTestClient.get().uri("/user/coaster/foo/latestMeasurements").exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().location("/login");
 
         webTestClient.post().uri("/user/editCoaster/foo").exchange()
                 .expectStatus().isForbidden();
@@ -86,7 +96,7 @@ class UserCoasterControllerTest extends WebFluxControllerTest {
                 .toList();
         var page = new PageImpl<>(coasters);
 
-        when(coasterService.getUserAssignedCoasters(any(), any())).thenReturn(Mono.just(page));
+        when(coasterManagementService.getUserAssignedCoasters(any(), any())).thenReturn(Mono.just(page));
         webTestClient.get().uri("/user").exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
@@ -99,7 +109,7 @@ class UserCoasterControllerTest extends WebFluxControllerTest {
         var displayName = "My personal coaster";
         var coaster = new Coaster(deviceName).setDisplayName(displayName);
 
-        when(coasterService.getCoasterDetails(eq(deviceName), any())).thenReturn(Mono.just(coaster));
+        when(coasterManagementService.getCoasterDetails(eq(deviceName), any())).thenReturn(Mono.just(coaster));
         webTestClient.get().uri("/user/coaster/" + deviceName).exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
@@ -111,7 +121,7 @@ class UserCoasterControllerTest extends WebFluxControllerTest {
         var deviceName = "esp001";
         var coaster = new Coaster(deviceName);
 
-        when(coasterService.getCoasterDetails(eq(deviceName), any())).thenReturn(Mono.just(coaster));
+        when(coasterManagementService.getCoasterDetails(eq(deviceName), any())).thenReturn(Mono.just(coaster));
         webTestClient.get().uri("/user/editCoaster/" + deviceName).exchange().expectStatus().isOk();
     }
 
@@ -129,7 +139,7 @@ class UserCoasterControllerTest extends WebFluxControllerTest {
                 .setDescription(newDescription)
                 .setTimezone(newTimezone)
                 .setPlace(newPlace);
-        when(coasterService.updateCoasterDetails(eq(deviceName), any(), any())).thenReturn(Mono.just(newCoaster));
+        when(coasterManagementService.updateCoasterDetails(eq(deviceName), any(), any())).thenReturn(Mono.just(newCoaster));
 
         webTestClient.mutateWith(csrf()).post().uri("/user/editCoaster/" + deviceName)
                 .body(fromFormData("displayName", newDisplayName)
@@ -187,7 +197,7 @@ class UserCoasterControllerTest extends WebFluxControllerTest {
         var coasterName = "esp001";
 
         var coaster = new Coaster(coasterName);
-        when(coasterService.removeCoasterFromUser(eq(coasterName), any())).thenReturn(Mono.just(coaster));
+        when(coasterManagementService.removeCoasterFromUser(eq(coasterName), any())).thenReturn(Mono.just(coaster));
 
         webTestClient.mutateWith(csrf()).post().uri("/user/removeCoaster/" + coasterName)
                 .exchange()
@@ -209,15 +219,9 @@ class UserCoasterControllerTest extends WebFluxControllerTest {
     void removeCoasterActionWithNonexistentCoasterFails() {
         var coasterName = "esp001";
 
-        when(coasterService.removeCoasterFromUser(eq(coasterName), any())).thenThrow(EntityNotFoundException.class);
-
+        when(coasterManagementService.removeCoasterFromUser(eq(coasterName), any())).thenThrow(EntityNotFoundException.class);
         webTestClient.mutateWith(csrf()).post().uri("/user/removeCoaster/" + coasterName)
                 .exchange()
                 .expectStatus().isNotFound();
-    }
-
-    @Test
-    void getMeasurements() {
-        // TODO: create assertions
     }
 }

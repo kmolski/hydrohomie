@@ -10,18 +10,16 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import pl.kmolski.hydrohomie.coaster.dto.UpdateCoasterDetailsDto;
 import pl.kmolski.hydrohomie.coaster.model.Measurement;
-import pl.kmolski.hydrohomie.coaster.repo.MeasurementRepository;
 import pl.kmolski.hydrohomie.coaster.service.CoasterManagementService;
+import pl.kmolski.hydrohomie.coaster.service.CoasterService;
 import pl.kmolski.hydrohomie.webmvc.util.PaginationUtil;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
 /**
  * User-accessible controller providing coaster presentation and management.
@@ -31,9 +29,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserCoasterController {
 
-    private final CoasterManagementService coasterService;
-    private final MeasurementRepository measurementRepository;
-    private final Clock clock;
+    private final CoasterService coasterService;
+    private final CoasterManagementService coasterManagementService;
 
     /**
      * Set the WebDataBinder to trim strings and convert empty strings to null.
@@ -56,7 +53,7 @@ public class UserCoasterController {
     @GetMapping
     public Mono<String> homepage(@RequestParam(value = "page", defaultValue = "0") int page,
                                  Authentication authentication, Model model) {
-        return coasterService.getUserAssignedCoasters(authentication.getName(), PaginationUtil.fromPage(page))
+        return coasterManagementService.getUserAssignedCoasters(authentication.getName(), PaginationUtil.fromPage(page))
                 .map(coasters -> {
                     model.addAttribute("coasters", coasters);
                     return "user_home";
@@ -73,7 +70,7 @@ public class UserCoasterController {
      */
     @GetMapping("/coaster/{id}")
     public Mono<String> showCoasterDetails(@PathVariable("id") String deviceName, Authentication auth, Model model) {
-        return coasterService.getCoasterDetails(deviceName, auth.getName())
+        return coasterManagementService.getCoasterDetails(deviceName, auth.getName())
                 .map(coaster -> {
                     model.addAttribute("coaster", coaster);
                     return "user_show_coaster";
@@ -92,7 +89,7 @@ public class UserCoasterController {
     @GetMapping("/editCoaster/{id}")
     public Mono<String> editCoasterForm(@PathVariable("id") String deviceName, Authentication auth,
                                         Model model, UpdateCoasterDetailsDto updateCoasterDetailsDto) {
-        return coasterService.getCoasterDetails(deviceName, auth.getName())
+        return coasterManagementService.getCoasterDetails(deviceName, auth.getName())
                 .map(coaster -> {
                     updateCoasterDetailsDto.setDisplayName(coaster.getDisplayName()).setDescription(coaster.getDescription());
                     updateCoasterDetailsDto.setTimezone(coaster.getTimezone()).setPlace(coaster.getPlace());
@@ -118,7 +115,7 @@ public class UserCoasterController {
             return Mono.just("user_edit_coaster");
         }
         model.addAttribute("redirect", "/user");
-        return coasterService.updateCoasterDetails(deviceName, auth.getName(), updateCoasterDto)
+        return coasterManagementService.updateCoasterDetails(deviceName, auth.getName(), updateCoasterDto)
                 .map(coaster -> {
                     var message = "Successfully updated coaster '" + deviceName + "'.";
                     model.addAttribute("message", message);
@@ -151,7 +148,7 @@ public class UserCoasterController {
     public Mono<String> removeCoasterAction(@PathVariable("id") String deviceName,
                                             Authentication authentication, Model model) {
         model.addAttribute("redirect", "/user");
-        return coasterService.removeCoasterFromUser(deviceName, authentication.getName())
+        return coasterManagementService.removeCoasterFromUser(deviceName, authentication.getName())
                 .map(coaster -> {
                     var message = "Successfully removed coaster '" + coaster.getDeviceName() + "' from your account.";
                     model.addAttribute("message", message);
@@ -161,19 +158,17 @@ public class UserCoasterController {
 
     @ResponseBody
     @GetMapping(path = "/coaster/{id}/measurements", produces = "application/json")
-    public Flux<Measurement> getMeasurements(@PathVariable("id") String deviceName,
-                                             @RequestParam("start") Long startTime,
-                                             @RequestParam(value = "end", required = false) Optional<Long> endTime,
-                                             @RequestParam("unit") ChronoUnit unit,
-                                             @RequestParam("tz") ZoneId tz) {
-        var start = Instant.ofEpochMilli(startTime);
-        var end = endTime.map(Instant::ofEpochMilli).orElseGet(() -> Instant.now(clock));
-        return measurementRepository.findByDeviceNameAndIntervalGrouped(deviceName, start, end, unit, tz);
+    public Flux<Measurement> getMeasurements(@PathVariable("id") String deviceName, @RequestParam("start") Long start,
+                                             @RequestParam("end") Long end, @RequestParam("unit") ChronoUnit unit,
+                                             @RequestParam("tz") ZoneId tz, Authentication authentication) {
+        var startTime = Instant.ofEpochMilli(start);
+        var endTime = Instant.ofEpochMilli(end);
+        return coasterService.getMeasurementsByIntervalGrouped(deviceName, authentication.getName(), startTime, endTime, unit, tz);
     }
 
     @ResponseBody
     @GetMapping(path = "/coaster/{id}/latestMeasurements", produces = "application/json")
-    public Flux<Measurement> getLatestMeasurements(@PathVariable("id") String deviceName) {
-        return measurementRepository.findTop10ByDeviceNameOrderByTimestampDesc(deviceName);
+    public Flux<Measurement> getLatestMeasurements(@PathVariable("id") String deviceName, Authentication authentication) {
+        return coasterService.getLatestMeasurements(deviceName, authentication.getName());
     }
 }

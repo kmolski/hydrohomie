@@ -15,18 +15,25 @@ import java.time.temporal.ChronoUnit;
 @Repository
 public interface MeasurementRepository extends ReactiveCrudRepository<Measurement, Integer> {
 
-    Flux<Measurement> findByDeviceNameAndTimestampBetween(String deviceName, Instant start, Instant end);
-
-    Flux<Measurement> findTop10ByDeviceNameOrderByTimestampDesc(String deviceName);
+    Flux<Measurement> findAllByDeviceName(String deviceName);
 
     @Query("""
-        select coalesce(sum(volume), 0) as volume, min(timestamp) as timestamp,
-               date_trunc(:unit, timestamp at time zone :tz) as ts_group
-        from measurements
-        where device_name = :device and timestamp between :start and :end
+        select m.*
+        from measurements m
+        join coasters c on m.device_name = c.device_name
+        where m.device_name = :device and c.owner = :owner
+        order by m.timestamp desc limit 10""")
+    Flux<Measurement> findTop10LatestByDeviceNameAndOwner(String deviceName, String owner);
+
+    @Query("""
+        select coalesce(sum(m.volume), 0) as volume, min(m.timestamp) as timestamp,
+               date_trunc(:unit, m.timestamp at time zone :tz) as ts_group
+        from measurements m
+        join coasters c on m.device_name = c.device_name
+        where m.device_name = :device and c.owner = :owner and m.timestamp between :start and :end
         group by ts_group""")
-    Flux<Measurement> findByDeviceNameAndIntervalGrouped(String device, Instant start, Instant end,
-                                                         ChronoUnit unit, ZoneId tz);
+    Flux<Measurement> findByDeviceNameAndOwnerAndIntervalGrouped(String device, String owner, Instant start,
+                                                                 Instant end, ChronoUnit unit, ZoneId tz);
 
     @Query("""
         select coalesce(sum(volume), 0) from measurements
