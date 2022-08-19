@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,14 +70,22 @@ public abstract class MqttHandlerIT extends WebFluxControllerIT {
         var latch = new CountDownLatch(assertions.length);
         mqttTestClient.subscribe(topic, (t, msg) -> {
             try {
-                int currentAssertion = (int) (assertions.length - latch.getCount());
-                assertions[currentAssertion].messageArrived(t, msg);
-                latch.countDown();
+                checkAssertion(latch, t, msg, assertions);
             } catch (Exception e) {
                 exceptions.add(e);
             }
         });
         assertTrue(exceptions.isEmpty(), "Assertions threw exceptions: " + exceptions);
         assertTrue(latch.await(10, TimeUnit.SECONDS), "Timed out");
+    }
+
+    private void checkAssertion(CountDownLatch latch, String topic, MqttMessage msg, IMqttMessageListener[] assertions) throws Exception {
+        getCurrentAssertion(latch, assertions).messageArrived(topic, msg);
+        latch.countDown();
+    }
+
+    private IMqttMessageListener getCurrentAssertion(CountDownLatch latch, IMqttMessageListener[] assertions) {
+        int currentAssertion = (int) (assertions.length - latch.getCount());
+        return assertions[currentAssertion];
     }
 }
