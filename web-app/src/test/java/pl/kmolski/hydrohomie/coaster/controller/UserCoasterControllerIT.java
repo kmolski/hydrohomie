@@ -57,7 +57,7 @@ class UserCoasterControllerIT extends WebFluxControllerIT {
         coasterRepository.create(coasterName, Instant.EPOCH, ZoneId.of("Etc/UTC")).block();
         coasterManagementService.assignCoasterToUser(coasterName, USERNAME).block();
 
-        measurementRepository.saveAll(Flux.fromStream(IntStream.range(0, 1000).boxed())
+        measurementRepository.saveAll(Flux.fromStream(IntStream.range(0, 200).boxed())
                 .map(i -> new Measurement(null, coasterName, i, Instant.EPOCH.plus(i, ChronoUnit.HOURS)))).blockLast();
 
         var result = webTestClient.mutateWith(csrf()).get()
