@@ -23,7 +23,6 @@ import reactor.core.publisher.Mono;
  * password changes, account enable/disable & user list fetch are handled here.
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserService implements ReactiveUserDetailsService {
 
@@ -39,6 +38,7 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Mono<UserDetails> findByUsername(String username) {
         LOGGER.debug("Fetching UserDetails for username={}", username);
         if (adminAccount.getUsername().equals(username)) {
@@ -59,6 +59,7 @@ public class UserService implements ReactiveUserDetailsService {
      * @param enabled the enabled status
      * @return the new user's account
      */
+    @Transactional
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<UserAccount> createAccount(String username, PlaintextPassword password, boolean enabled) {
         LOGGER.info("Creating account for user '{}' with enabled={}", username, enabled);
@@ -73,6 +74,7 @@ public class UserService implements ReactiveUserDetailsService {
      * @param pageable the page descriptor
      * @return the requested page of {@link UserAccount}
      */
+    @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<Page<UserAccount>> getAllAccounts(Pageable pageable) {
         LOGGER.debug("Fetching user accounts for page {}", pageable);
@@ -89,6 +91,7 @@ public class UserService implements ReactiveUserDetailsService {
      * @param password the new plaintext password
      * @return the updated {@link UserAccount}
      */
+    @Transactional
     @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and principal.username == username)")
     public Mono<UserAccount> updatePassword(String username, PlaintextPassword password) {
         LOGGER.info("Updating password for user '{}'", username);
@@ -106,6 +109,7 @@ public class UserService implements ReactiveUserDetailsService {
      * @param enabled the desired enabled status
      * @return the updated {@link UserAccount}
      */
+    @Transactional
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<UserAccount> setAccountEnabled(String username, boolean enabled) {
         LOGGER.info("Setting user '{}' to enabled={}", username, enabled);
@@ -122,6 +126,7 @@ public class UserService implements ReactiveUserDetailsService {
      * @param username the name of the user to delete
      * @return the deleted user
      */
+    @Transactional
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<UserAccount> deleteAccount(String username) {
         LOGGER.info("Deleting account for user '{}'", username);

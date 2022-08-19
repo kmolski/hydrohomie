@@ -17,7 +17,6 @@ import pl.kmolski.hydrohomie.webmvc.exception.EntityNotFoundException;
 import reactor.core.publisher.Mono;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CoasterManagementService {
 
@@ -36,6 +35,7 @@ public class CoasterManagementService {
                 .flatMap(coasterRepository::save);
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<Page<Coaster>> getUnassignedCoasters(Pageable pageable) {
         LOGGER.debug("Fetching unassigned coasters for page {}", pageable);
@@ -45,6 +45,7 @@ public class CoasterManagementService {
                 .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
     }
 
+    @Transactional
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Mono<Coaster> assignCoasterToUser(String deviceName, String username) {
         return updateCoasterOwner(deviceName, null, username)
@@ -55,6 +56,7 @@ public class CoasterManagementService {
                         exc -> Mono.error(new EntityNotFoundException("User not found")));
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
     public Mono<Page<Coaster>> getUserAssignedCoasters(String username, Pageable pageable) {
         LOGGER.debug("Fetching assigned coasters for user '{}', page {}", username, pageable);
@@ -64,6 +66,7 @@ public class CoasterManagementService {
                 .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
     }
 
+    @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
     public Mono<Coaster> getCoasterDetails(String deviceName, String username) {
         return findCoasterOrFail(deviceName, username)
@@ -71,6 +74,7 @@ public class CoasterManagementService {
                         coaster.getDeviceName(), username));
     }
 
+    @Transactional
     @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
     public Mono<Coaster> updateCoasterDetails(String deviceName, String username, UpdateCoasterDetailsDto detailsDto) {
         return findCoasterOrFail(deviceName, username)
@@ -83,6 +87,7 @@ public class CoasterManagementService {
                         coaster.getDeviceName(), username));
     }
 
+    @Transactional
     @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
     public Mono<Coaster> removeCoasterFromUser(String deviceName, String username) {
         return updateCoasterOwner(deviceName, username, null)
