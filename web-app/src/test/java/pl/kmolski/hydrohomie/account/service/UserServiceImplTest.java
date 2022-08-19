@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("ReactiveStreamsUnusedPublisher")
-class UserServiceTest {
+class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -34,7 +34,7 @@ class UserServiceTest {
     private AdminAccount adminAccount;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Test
     void findUserAccountByUsernameSucceeds() {

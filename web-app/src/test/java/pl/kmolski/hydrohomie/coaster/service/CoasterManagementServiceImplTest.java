@@ -23,13 +23,13 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("ReactiveStreamsUnusedPublisher")
-class CoasterManagementServiceTest {
+class CoasterManagementServiceImplTest {
 
     @Mock
     private CoasterRepository coasterRepository;
 
     @InjectMocks
-    private CoasterManagementService coasterManagementService;
+    private CoasterManagementServiceImpl coasterManagementService;
 
     @Test
     @WithMockUser(roles = {"ADMIN"})

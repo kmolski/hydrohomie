@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CoasterServiceTest {
+class CoasterServiceImplTest {
 
     @Mock
     private CoasterRepository coasterRepository;
@@ -31,7 +31,7 @@ class CoasterServiceTest {
     private MeasurementRepository measurementRepository;
 
     @InjectMocks
-    private CoasterService coasterService;
+    private CoasterServiceImpl coasterService;
 
     @Test
     void getExistingCoasterAndDailySumVolumeSucceeds() {
