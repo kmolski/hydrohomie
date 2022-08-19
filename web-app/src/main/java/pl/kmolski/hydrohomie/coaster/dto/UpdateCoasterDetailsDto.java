@@ -6,6 +6,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.ZoneId;
 
+/**
+ * Data class describing the new coaster entity details.
+ * Contains the new display name, description, timezone and place information.
+ */
 @Data
 public class UpdateCoasterDetailsDto {
 

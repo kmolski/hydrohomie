@@ -156,6 +156,17 @@ public class UserCoasterController {
                 });
     }
 
+    /**
+     * Fetch measurements for the given coaster in the specified time period and timezone, grouped by the time unit.
+     *
+     * @param deviceName the name of the coaster
+     * @param start the period start time
+     * @param end the period end time
+     * @param unit the time unit to group by
+     * @param tz the period time zone
+     * @param authentication the user's authentication object
+     * @return the list of measurements
+     */
     @ResponseBody
     @GetMapping(path = "/coaster/{id}/measurements", produces = "application/json")
     public Flux<Measurement> getMeasurements(@PathVariable("id") String deviceName, @RequestParam("start") Long start,
@@ -166,6 +177,13 @@ public class UserCoasterController {
         return coasterService.getMeasurementsByIntervalGrouped(deviceName, authentication.getName(), startTime, endTime, unit, tz);
     }
 
+    /**
+     * Fetch the last 10 measurements for the given coaster.
+     *
+     * @param deviceName the name of the coaster
+     * @param authentication the user's authentication object
+     * @return the list of measurements
+     */
     @ResponseBody
     @GetMapping(path = "/coaster/{id}/latestMeasurements", produces = "application/json")
     public Flux<Measurement> getLatestMeasurements(@PathVariable("id") String deviceName, Authentication authentication) {

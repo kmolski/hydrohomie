@@ -7,6 +7,10 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.Instant;
 import java.time.ZoneId;
 
+/**
+ * Models the coaster details: display name, description, timezone, place, owner;
+ * and device state: initial weight measurement and inactivity time.
+ */
 @Data
 @Table("coasters")
 public class Coaster {
