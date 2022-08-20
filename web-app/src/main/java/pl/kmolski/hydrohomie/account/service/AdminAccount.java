@@ -13,14 +13,13 @@ import java.util.Set;
 import static pl.kmolski.hydrohomie.account.model.AccountRole.ROLE_ADMIN;
 
 /**
- * <p>Admin user account, with credentials provided through Spring properties.</p>
+ * <p>Admin user account, with credentials provided through Spring properties.
  * <p>
- *     This class uses the following properties:
- *     <ul>
- *         <li>admin.username - admin username</li>
- *         <li>admin.password - admin plaintext password</li>
- *     </ul>
- * </p>
+ * This class uses the following properties:
+ * <ul>
+ *     <li>admin.username - admin username</li>
+ *     <li>admin.password - admin plaintext password</li>
+ * </ul>
  */
 @Getter
 @Component

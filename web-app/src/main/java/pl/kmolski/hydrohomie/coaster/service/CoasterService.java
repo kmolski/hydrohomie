@@ -14,7 +14,7 @@ import java.time.temporal.ChronoUnit;
 
 /**
  * Coaster state management service. Operations like inactivity time/initial load
- * update, coaster state reset, creating & fetching measurements are handled here.
+ * update, coaster state reset, creating and fetching measurements are handled here.
  */
 public interface CoasterService {
 

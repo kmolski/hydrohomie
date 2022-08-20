@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * Coaster entity management service. Operations like coaster creation, removal,
- * assignment, disassociation & coaster detail update are handled here.
+ * assignment, disassociation and coaster detail update are handled here.
  */
 public interface CoasterManagementService {
 

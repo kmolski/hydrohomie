@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * User account management service. Operations like user creation, removal,
- * password changes, account enable/disable & user list fetch are handled here.
+ * password changes, account enable/disable and user list fetch are handled here.
  */
 public interface UserService extends ReactiveUserDetailsService {
 

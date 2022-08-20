@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import static pl.kmolski.hydrohomie.account.model.AccountRole.ROLE_ADMIN;
 
 /**
- * Common root controller for authenticated & unauthenticated users.
+ * Common root controller for authenticated and unauthenticated users.
  */
 @Controller
 @RequestMapping("/")

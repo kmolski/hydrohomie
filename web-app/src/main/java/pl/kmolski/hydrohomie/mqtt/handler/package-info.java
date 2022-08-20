@@ -1,7 +1,7 @@
 /**
- * MQTT message handlers that facilitate communication with the smart coaster.
+ * MQTT message handlers that facilitate communication with the smart coaster
  * <p>
- *     The communication flow works like this:
+ * The communication flow works like this:
  * <ol>
  *     <li>
  *         Coaster starts, sends {@link pl.kmolski.hydrohomie.mqtt.model.CoasterMessage.ConnectedMessage ConnectedMessage}
@@ -28,10 +28,8 @@
  *         Web app listens for the device topic messages sent by the coaster and executes actions to handle them.
  *         For example, the base measurements can be reset, measurements can be saved to the database, etc.
  *     </li>
- *     <p>
- *         All inbound & outbound messages are encoded as JSON/UTF-8.
- *     </p>
  * </ol>
- * </p>
+ *
+ * All inbound and outbound messages are encoded as JSON/UTF-8.
  */
 package pl.kmolski.hydrohomie.mqtt.handler;
