@@ -42,6 +42,22 @@ jobs:
       with:
         name: jacoco-report
         path: web-app/build/reports/jacoco/
+
+    - name: Generate JavaDoc with Gradle
+      working-directory: ./web-app
+      run: ./gradlew javadoc
+
+    - name: Copy JavaDoc to Github Pages directory
+      run: |
+        rm -rf docs/
+        cp -rf web-app/build/docs/javadoc/. docs/
+    
+    - name: Commit and push JavaDoc if it changed
+      uses: EndBug/add-and-commit@v7
+      with:
+        default_author: github_actions
+        message: 'Update JavaDoc'
+        add: 'docs/'
     
     - name: Build Spring Boot JAR with Gradle
       working-directory: ./web-app
