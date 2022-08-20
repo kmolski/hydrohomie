@@ -57,7 +57,7 @@ jobs:
       with:
         default_author: github_actions
         message: 'Update JavaDoc'
-        add: 'docs/'
+        add: '--force docs/'
     
     - name: Build Spring Boot JAR with Gradle
       working-directory: ./web-app
