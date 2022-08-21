@@ -147,8 +147,7 @@ extends org.springframework.security.core.userdetails.ReactiveUserDetailsService
 <li>
 <section class="detail" id="findByUsername(java.lang.String)">
 <h3>findByUsername</h3>
-<div class="member-signature"><span class="annotations">@Transactional(readOnly=true)
-</span><span class="return-type">reactor.core.publisher.Mono&lt;org.springframework.security.core.userdetails.UserDetails&gt;</span>&nbsp;<span class="element-name">findByUsername</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username)</span></div>
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;org.springframework.security.core.userdetails.UserDetails&gt;</span>&nbsp;<span class="element-name">findByUsername</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>findByUsername</code>&nbsp;in interface&nbsp;<code>org.springframework.security.core.userdetails.ReactiveUserDetailsService</code></dd>
@@ -158,9 +157,7 @@ extends org.springframework.security.core.userdetails.ReactiveUserDetailsService
 <li>
 <section class="detail" id="createAccount(java.lang.String,pl.kmolski.hydrohomie.account.dto.PlaintextPassword,boolean)">
 <h3>createAccount</h3>
-<div class="member-signature"><span class="annotations">@Transactional
-@PreAuthorize("hasRole(\'ROLE_ADMIN\')")
-</span><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;</span>&nbsp;<span class="element-name">createAccount</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;</span>&nbsp;<span class="element-name">createAccount</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username,
  <a href="../dto/PlaintextPassword.html" title="class in pl.kmolski.hydrohomie.account.dto">PlaintextPassword</a>&nbsp;password,
  boolean&nbsp;enabled)</span></div>
 <div class="block">Create the user account with the specified username, plaintext password and enabled status.</div>
@@ -177,9 +174,7 @@ extends org.springframework.security.core.userdetails.ReactiveUserDetailsService
 <li>
 <section class="detail" id="getAllAccounts(org.springframework.data.domain.Pageable)">
 <h3>getAllAccounts</h3>
-<div class="member-signature"><span class="annotations">@Transactional(readOnly=true)
-@PreAuthorize("hasRole(\'ROLE_ADMIN\')")
-</span><span class="return-type">reactor.core.publisher.Mono&lt;org.springframework.data.domain.Page&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;&gt;</span>&nbsp;<span class="element-name">getAllAccounts</span><wbr><span class="parameters">(org.springframework.data.domain.Pageable&nbsp;pageable)</span></div>
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;org.springframework.data.domain.Page&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;&gt;</span>&nbsp;<span class="element-name">getAllAccounts</span><wbr><span class="parameters">(org.springframework.data.domain.Pageable&nbsp;pageable)</span></div>
 <div class="block">Fetch the specified page of user account data.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -192,9 +187,7 @@ extends org.springframework.security.core.userdetails.ReactiveUserDetailsService
 <li>
 <section class="detail" id="updatePassword(java.lang.String,pl.kmolski.hydrohomie.account.dto.PlaintextPassword)">
 <h3>updatePassword</h3>
-<div class="member-signature"><span class="annotations">@Transactional
-@PreAuthorize("hasRole(\'ROLE_ADMIN\') or (hasRole(\'ROLE_USER\') and principal.username == username)")
-</span><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;</span>&nbsp;<span class="element-name">updatePassword</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;</span>&nbsp;<span class="element-name">updatePassword</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username,
  <a href="../dto/PlaintextPassword.html" title="class in pl.kmolski.hydrohomie.account.dto">PlaintextPassword</a>&nbsp;password)</span></div>
 <div class="block">Change the user's existing password to the specified plaintext password.</div>
 <dl class="notes">
@@ -209,9 +202,7 @@ extends org.springframework.security.core.userdetails.ReactiveUserDetailsService
 <li>
 <section class="detail" id="setAccountEnabled(java.lang.String,boolean)">
 <h3>setAccountEnabled</h3>
-<div class="member-signature"><span class="annotations">@Transactional
-@PreAuthorize("hasRole(\'ROLE_ADMIN\')")
-</span><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;</span>&nbsp;<span class="element-name">setAccountEnabled</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;</span>&nbsp;<span class="element-name">setAccountEnabled</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username,
  boolean&nbsp;enabled)</span></div>
 <div class="block">Set the user's enabled status.</div>
 <dl class="notes">
@@ -226,9 +217,7 @@ extends org.springframework.security.core.userdetails.ReactiveUserDetailsService
 <li>
 <section class="detail" id="deleteAccount(java.lang.String)">
 <h3>deleteAccount</h3>
-<div class="member-signature"><span class="annotations">@Transactional
-@PreAuthorize("hasRole(\'ROLE_ADMIN\')")
-</span><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;</span>&nbsp;<span class="element-name">deleteAccount</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username)</span></div>
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/UserAccount.html" title="class in pl.kmolski.hydrohomie.account.model">UserAccount</a>&gt;</span>&nbsp;<span class="element-name">deleteAccount</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username)</span></div>
 <div class="block">Delete the specified user.</div>
 <dl class="notes">
 <dt>Parameters:</dt>

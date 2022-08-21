@@ -159,8 +159,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="getCoasterAndDailySumVolume(java.lang.String,java.time.Instant)">
 <h3>getCoasterAndDailySumVolume</h3>
-<div class="member-signature"><span class="annotations">@Transactional(readOnly=true)
-</span><span class="return-type">reactor.core.publisher.Mono&lt;reactor.util.function.Tuple2&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Float.html" title="class or interface in java.lang" class="external-link">Float</a>&gt;&gt;</span>&nbsp;<span class="element-name">getCoasterAndDailySumVolume</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;reactor.util.function.Tuple2&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Float.html" title="class or interface in java.lang" class="external-link">Float</a>&gt;&gt;</span>&nbsp;<span class="element-name">getCoasterAndDailySumVolume</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;now)</span></div>
 <div class="block">Fetch the coaster entity and the sum of volume measurements for the given date.</div>
 <dl class="notes">
@@ -175,8 +174,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="updateCoasterInactivity(java.lang.String,int,java.time.Instant)">
 <h3>updateCoasterInactivity</h3>
-<div class="member-signature"><span class="annotations">@Transactional
-</span><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>&gt;</span>&nbsp;<span class="element-name">updateCoasterInactivity</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>&gt;</span>&nbsp;<span class="element-name">updateCoasterInactivity</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
  int&nbsp;inactiveSeconds,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;now)</span></div>
 <div class="block">Update the coaster inactivity time with the specified value.</div>
@@ -193,8 +191,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="updateCoasterInitLoad(java.lang.String,float,java.time.Instant)">
 <h3>updateCoasterInitLoad</h3>
-<div class="member-signature"><span class="annotations">@Transactional
-</span><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>&gt;</span>&nbsp;<span class="element-name">updateCoasterInitLoad</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>&gt;</span>&nbsp;<span class="element-name">updateCoasterInitLoad</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
  float&nbsp;initLoad,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;now)</span></div>
 <div class="block">Update the coaster initial weight measurement with the specified value.</div>
@@ -211,8 +208,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="createMeasurement(java.lang.String,pl.kmolski.hydrohomie.coaster.model.Measurement,java.time.Instant)">
 <h3>createMeasurement</h3>
-<div class="member-signature"><span class="annotations">@Transactional
-</span><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>&gt;</span>&nbsp;<span class="element-name">createMeasurement</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>&gt;</span>&nbsp;<span class="element-name">createMeasurement</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
  <a href="../model/Measurement.html" title="class in pl.kmolski.hydrohomie.coaster.model">Measurement</a>&nbsp;measurement,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;now)</span></div>
 <div class="block">Create a <a href="../model/Measurement.html" title="class in pl.kmolski.hydrohomie.coaster.model"><code>Measurement</code></a> for the specified <a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model"><code>Coaster</code></a>.</div>
@@ -229,8 +225,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="resetCoasterState(java.lang.String,java.time.Instant)">
 <h3>resetCoasterState</h3>
-<div class="member-signature"><span class="annotations">@Transactional
-</span><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>&gt;</span>&nbsp;<span class="element-name">resetCoasterState</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Mono&lt;<a href="../model/Coaster.html" title="class in pl.kmolski.hydrohomie.coaster.model">Coaster</a>&gt;</span>&nbsp;<span class="element-name">resetCoasterState</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;now)</span></div>
 <div class="block">Reset the coaster state in the database.</div>
 <dl class="notes">
@@ -245,9 +240,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="getMeasurementsByIntervalGrouped(java.lang.String,java.lang.String,java.time.Instant,java.time.Instant,java.time.temporal.ChronoUnit,java.time.ZoneId)">
 <h3>getMeasurementsByIntervalGrouped</h3>
-<div class="member-signature"><span class="annotations">@Transactional(readOnly=true)
-@PreAuthorize("hasRole(\'ROLE_USER\') and principal.username == username")
-</span><span class="return-type">reactor.core.publisher.Flux&lt;<a href="../model/Measurement.html" title="class in pl.kmolski.hydrohomie.coaster.model">Measurement</a>&gt;</span>&nbsp;<span class="element-name">getMeasurementsByIntervalGrouped</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Flux&lt;<a href="../model/Measurement.html" title="class in pl.kmolski.hydrohomie.coaster.model">Measurement</a>&gt;</span>&nbsp;<span class="element-name">getMeasurementsByIntervalGrouped</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;start,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a>&nbsp;end,
@@ -270,9 +263,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="getLatestMeasurements(java.lang.String,java.lang.String)">
 <h3>getLatestMeasurements</h3>
-<div class="member-signature"><span class="annotations">@Transactional(readOnly=true)
-@PreAuthorize("hasRole(\'ROLE_USER\') and principal.username == username")
-</span><span class="return-type">reactor.core.publisher.Flux&lt;<a href="../model/Measurement.html" title="class in pl.kmolski.hydrohomie.coaster.model">Measurement</a>&gt;</span>&nbsp;<span class="element-name">getLatestMeasurements</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
+<div class="member-signature"><span class="return-type">reactor.core.publisher.Flux&lt;<a href="../model/Measurement.html" title="class in pl.kmolski.hydrohomie.coaster.model">Measurement</a>&gt;</span>&nbsp;<span class="element-name">getLatestMeasurements</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deviceName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;username)</span></div>
 <div class="block">Fetch the 10 latest measurements for the coaster.</div>
 <dl class="notes">
