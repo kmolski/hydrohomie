@@ -2,8 +2,8 @@ admin:
   username: ${ADMIN_USER}
   password: ${ADMIN_PASS}
 mqtt:
-  client-id: ${MQTT_CLIENT_ID:-backend}
-  topic: ${MQTT_TOPIC:-hydrohomie}
+  client-id: ${MQTT_CLIENT_ID:backend}
+  topic: ${MQTT_TOPIC:hydrohomie}
   url: ${MQTT_URL}
 spring:
   liquibase:
