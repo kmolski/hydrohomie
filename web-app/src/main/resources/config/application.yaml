@@ -6,11 +6,11 @@ mqtt:
   topic: ${MQTT_TOPIC:-hydrohomie}
   url: ${MQTT_URL}
 spring:
-  #liquibase:
-  #  change-log: classpath:liquibase/changelog_master.yaml
-  #  url: jdbc:postgresql://${DB_HOST}/${DB_NAME}
-  #  user: ${DB_USER}
-  #  password: ${DB_PASS}
+  liquibase:
+    change-log: classpath:liquibase/changelog_master.yaml
+    url: jdbc:postgresql://${DB_HOST}/${DB_NAME}
+    user: ${DB_USER}
+    password: ${DB_PASS}
   r2dbc:
     url: r2dbc:postgresql://${DB_HOST}/${DB_NAME}
     username: ${DB_USER}
