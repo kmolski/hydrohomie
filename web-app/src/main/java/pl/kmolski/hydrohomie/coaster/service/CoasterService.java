@@ -1,7 +1,5 @@
 package pl.kmolski.hydrohomie.coaster.service;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import pl.kmolski.hydrohomie.coaster.model.Coaster;
 import pl.kmolski.hydrohomie.coaster.model.Measurement;
 import reactor.core.publisher.Flux;
@@ -25,7 +23,6 @@ public interface CoasterService {
      * @param now        the date to fetch the volume sum for
      * @return {@link Tuple2} containing the {@link Coaster} entity and volume sum
      */
-    @Transactional(readOnly = true)
     Mono<Tuple2<Coaster, Float>> getCoasterAndDailySumVolume(String deviceName, Instant now);
 
     /**
@@ -36,7 +33,6 @@ public interface CoasterService {
      * @param now             the current time
      * @return the updated {@link Coaster} entity
      */
-    @Transactional
     Mono<Coaster> updateCoasterInactivity(String deviceName, int inactiveSeconds, Instant now);
 
     /**
@@ -47,7 +43,6 @@ public interface CoasterService {
      * @param now        the current time
      * @return the updated {@link Coaster} entity
      */
-    @Transactional
     Mono<Coaster> updateCoasterInitLoad(String deviceName, float initLoad, Instant now);
 
     /**
@@ -58,7 +53,6 @@ public interface CoasterService {
      * @param now         the current time
      * @return the {@link Coaster entity}
      */
-    @Transactional
     Mono<Coaster> createMeasurement(String deviceName, Measurement measurement, Instant now);
 
     /**
@@ -68,7 +62,6 @@ public interface CoasterService {
      * @param now        the current time
      * @return the reset {@link Coaster} entity
      */
-    @Transactional
     Mono<Coaster> resetCoasterState(String deviceName, Instant now);
 
     /**
@@ -82,8 +75,6 @@ public interface CoasterService {
      * @param timezone   the period time zone
      * @return {@link Flux} of grouped {@link Measurement Measurements} for the coaster
      */
-    @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
     Flux<Measurement> getMeasurementsByIntervalGrouped(String deviceName, String username, Instant start,
                                                        Instant end, ChronoUnit timeUnit, ZoneId timezone);
 
@@ -94,7 +85,5 @@ public interface CoasterService {
      * @param username   the coaster owner's username
      * @return {@link Flux} of the latest {@link Measurement Measurements} for the coaster
      */
-    @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ROLE_USER') and principal.username == username")
     Flux<Measurement> getLatestMeasurements(String deviceName, String username);
 }
