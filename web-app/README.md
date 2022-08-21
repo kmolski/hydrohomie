@@ -8,7 +8,7 @@ Companion web app for the smart coaster device, built with Java 17 and open-sour
 This application is entirely optional. The smart coaster can function without it, although with
 slightly limited functionality (e.g. no measurement/daily total persistence between device restarts).
 
-For more details about the application structure, view the [JavaDocs](../docs/index.html).
+For more details about the application structure, view the [JavaDocs](https://kmolski.github.io/hydrohomie/docs/).
 
 <p style="text-align: center;">
 <table style="padding: 0px; border-spacing: 0px;">
