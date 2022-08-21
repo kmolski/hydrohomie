@@ -6,7 +6,7 @@ The coaster device, based on the ESP32 MCU, uses a load sensor to measure the vo
 which is then (optionally) sent over Wi-Fi & MQTT to the web application for storage and presentation purposes.
 
 This started out as my 5th semester project for the Microprocessor and Embedded Systems course, for which I
-prepared the hardware and firmware components. I made the web application later, primarily as a means to
+prepared the hardware and firmware components. I the web application was created later, primarily as a means to
 get some practice with new Java features and popular libraries, like Spring Integration/Security and Mockito.
 
 Project components
