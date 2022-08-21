@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:14.2
+    environment:
+      - POSTGRES_DB=${DB_NAME:-hydrohomie}
+      - POSTGRES_USER=${DB_USER:-hydrohomie}
+      - POSTGRES_PASSWORD=${DB_PASS:-hydrohomie}
+    volumes:
+      - ${PWD}/compose/data:/var/lib/postgresql/data
+  mosquitto:
+    image: eclipse-mosquitto:2.0.14
+    ports:
+      - "1883:1883"
+    volumes:
+      - ${PWD}/compose/mosquitto.conf:/mosquitto/config/mosquitto.conf
+  backend:
+    image: hydrohomie:1.0.0-SNAPSHOT
+    environment:
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-admin}
+      - MQTT_URL=${MQTT_URL:-tcp://mosquitto:1883}
+      - DB_HOST=${DB_HOST:-postgres}
+      - DB_NAME=${DB_NAME:-hydrohomie}
+      - DB_USER=${DB_USER:-hydrohomie}
+      - DB_PASS=${DB_PASS:-hydrohomie}
+    ports:
+      - "8080:8080"
